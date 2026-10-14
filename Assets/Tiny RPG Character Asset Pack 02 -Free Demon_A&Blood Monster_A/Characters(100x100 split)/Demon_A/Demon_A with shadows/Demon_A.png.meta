@@ -1,0 +1,459 @@
+fileFormatVersion: 2
+guid: 42070d4c4ad96ce439929df3aa5afefd
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2889504372158107583
+    second: Demon_A_0
+  - first:
+      213: -2845389596672415584
+    second: Demon_A_1
+  - first:
+      213: -2388438283080120983
+    second: Demon_A_2
+  - first:
+      213: 4539585400677267816
+    second: Demon_A_3
+  - first:
+      213: -642187548928336953
+    second: Demon_A_4
+  - first:
+      213: -1893378509600908905
+    second: Demon_A_5
+  - first:
+      213: -6478242860333750227
+    second: Demon_A_6
+  - first:
+      213: 562065907503204546
+    second: Demon_A_7
+  - first:
+      213: -6299978325122309566
+    second: Demon_A_8
+  - first:
+      213: 5302311165565427577
+    second: Demon_A_9
+  - first:
+      213: -3251386134081626283
+    second: Demon_A_10
+  - first:
+      213: 6461308127741819256
+    second: Demon_A_11
+  - first:
+      213: 8230213089078974033
+    second: Demon_A_12
+  - first:
+      213: 5449872293609932573
+    second: Demon_A_13
+  - first:
+      213: 7987900372219685327
+    second: Demon_A_14
+  - first:
+      213: -181062999788312530
+    second: Demon_A_15
+  - first:
+      213: -2927382001390090530
+    second: Demon_A_16
+  - first:
+      213: -6926446499504170950
+    second: Demon_A_17
+  - first:
+      213: -9025543102222907110
+    second: Demon_A_18
+  - first:
+      213: -5081992248949472463
+    second: Demon_A_19
+  - first:
+      213: 4923905687803919536
+    second: Demon_A_20
+  - first:
+      213: 8144128102270793223
+    second: Demon_A_21
+  - first:
+      213: 3921740169482051240
+    second: Demon_A_22
+  - first:
+      213: 1079784092209761142
+    second: Demon_A_23
+  - first:
+      213: -2231183850388806305
+    second: Demon_A_24
+  - first:
+      213: 1914383007585919735
+    second: Demon_A_25
+  - first:
+      213: 683185673480969841
+    second: Demon_A_26
+  - first:
+      213: -2278720913277244138
+    second: Demon_A_27
+  - first:
+      213: 2274284189435677488
+    second: Demon_A_28
+  - first:
+      213: -7778533943498202224
+    second: Demon_A_29
+  - first:
+      213: -1032025675432071710
+    second: Demon_A_30
+  - first:
+      213: 3311632302883290502
+    second: Demon_A_31
+  - first:
+      213: 7423692324011659908
+    second: Demon_A_32
+  - first:
+      213: 3657348594377127115
+    second: Demon_A_33
+  - first:
+      213: 2194156275979285776
+    second: Demon_A_34
+  - first:
+      213: 4229089288056240640
+    second: Demon_A_35
+  - first:
+      213: 2494468411858192111
+    second: Demon_A_36
+  - first:
+      213: 30695143589569656
+    second: Demon_A_37
+  - first:
+      213: -1967406769291949848
+    second: Demon_A_38
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Demon_A_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbf0c6fcae4991820800000000000000
+      internalID: 2889504372158107583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_A_1
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a8afb2cc352388d0800000000000000
+      internalID: -2845389596672415584
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_A_2
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 965c01939009aded0800000000000000
+      internalID: -2388438283080120983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_A_3
+      rect:
+        serializedVersion: 2
+        x: 300
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 869fae2ced8dffe30800000000000000
+      internalID: 4539585400677267816
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_A_4
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7cb92f2a3dd7617f0800000000000000
+      internalID: -642187548928336953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_A_5
+      rect:
+        serializedVersion: 2
+        x: 500
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79911ede64e59b5e0800000000000000
+      internalID: -1893378509600908905
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_A_6
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d28a8151178a816a0800000000000000
+      internalID: -6478242860333750227
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon_A_7
+      rect:
+        serializedVersion: 2
+        x: 700
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c8061507fbdcc700800000000000000
+      internalID: 562065907503204546
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 375dc4efbd361a840b2173b06e5779d5
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Demon_A_0: 2889504372158107583
+      Demon_A_1: -2845389596672415584
+      Demon_A_2: -2388438283080120983
+      Demon_A_3: 4539585400677267816
+      Demon_A_4: -642187548928336953
+      Demon_A_5: -1893378509600908905
+      Demon_A_6: -6478242860333750227
+      Demon_A_7: 562065907503204546
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

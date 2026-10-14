@@ -1,0 +1,682 @@
+fileFormatVersion: 2
+guid: 47f2ebcd72f8f8f4bac370315048e91a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3112354578019768866
+    second: castle_deco_0
+  - first:
+      213: -7365738125143384490
+    second: castle_deco_1
+  - first:
+      213: -6297239174872095222
+    second: castle_deco_2
+  - first:
+      213: -3231579344003488757
+    second: castle_deco_3
+  - first:
+      213: 6291449856342907824
+    second: castle_deco_4
+  - first:
+      213: 1925916309707015858
+    second: castle_deco_5
+  - first:
+      213: -8055908221592112740
+    second: castle_deco_6
+  - first:
+      213: -7989472574721422153
+    second: castle_deco_7
+  - first:
+      213: 1311693012618005259
+    second: castle_deco_8
+  - first:
+      213: -8338756988105646946
+    second: castle_deco_9
+  - first:
+      213: 5104509231977732080
+    second: castle_deco_10
+  - first:
+      213: -7650925252933498771
+    second: castle_deco_11
+  - first:
+      213: -7494875966224967109
+    second: castle_deco_12
+  - first:
+      213: 25555934835086983
+    second: castle_deco_13
+  - first:
+      213: 419224826864422944
+    second: castle_deco_14
+  - first:
+      213: -8203275473175078388
+    second: castle_deco_15
+  - first:
+      213: 3945884693879967001
+    second: castle_deco_16
+  - first:
+      213: -4046895869852807431
+    second: castle_deco_17
+  - first:
+      213: -8642852108267991290
+    second: castle_deco_18
+  - first:
+      213: 5131191753962708399
+    second: castle_deco_19
+  - first:
+      213: 7349984464871614056
+    second: castle_deco_20
+  - first:
+      213: 1810606459594407073
+    second: castle_deco_21
+  - first:
+      213: -3876790399445634662
+    second: castle_deco_22
+  - first:
+      213: -8541651918310912002
+    second: castle_deco_23
+  - first:
+      213: 6688574452489668202
+    second: castle_deco_24
+  - first:
+      213: -8362792491011611314
+    second: castle_deco_25
+  - first:
+      213: 1147141103172709670
+    second: castle_deco_26
+  - first:
+      213: 3138469025300318947
+    second: castle_deco_27
+  - first:
+      213: 2714670839300927236
+    second: castle_deco_28
+  - first:
+      213: 5766994341092523437
+    second: castle_deco_29
+  - first:
+      213: 4248437981784891097
+    second: castle_deco_30
+  - first:
+      213: 5466234914866892376
+    second: castle_deco_31
+  - first:
+      213: 8169817510356018383
+    second: castle_deco_32
+  - first:
+      213: -7336353920186277084
+    second: castle_deco_33
+  - first:
+      213: 7313254221995216270
+    second: castle_deco_34
+  - first:
+      213: 4150297665895772159
+    second: castle_deco_35
+  - first:
+      213: -3970745717387862449
+    second: castle_deco_36
+  - first:
+      213: 3398200365242215478
+    second: castle_deco_37
+  - first:
+      213: 3042174393690033309
+    second: castle_deco_38
+  - first:
+      213: 1054005105071454951
+    second: castle_deco_39
+  - first:
+      213: -6317193095944768811
+    second: castle_deco_40
+  - first:
+      213: 3353770078288514829
+    second: castle_deco_41
+  - first:
+      213: 2967146245922195407
+    second: castle_deco_42
+  - first:
+      213: 190103075513642166
+    second: castle_deco_43
+  - first:
+      213: -911917472977192722
+    second: castle_deco_44
+  - first:
+      213: -5585366085362016748
+    second: castle_deco_45
+  - first:
+      213: -8340553172962528643
+    second: castle_deco_46
+  - first:
+      213: 5422157193079381749
+    second: castle_deco_47
+  - first:
+      213: -3886520533497134723
+    second: castle_deco_48
+  - first:
+      213: -4515339841980552003
+    second: castle_deco_49
+  - first:
+      213: -1988952114925425504
+    second: castle_deco_50
+  - first:
+      213: 687470562655416483
+    second: castle_deco_51
+  - first:
+      213: -2276663016926747662
+    second: castle_deco_52
+  - first:
+      213: -2203424687905013267
+    second: rug_brown_v
+  - first:
+      213: 1455397842359086632
+    second: rug_green_v
+  - first:
+      213: 8438225300024749146
+    second: rug_teal_v
+  - first:
+      213: -3430204323407598118
+    second: rug_olive_h
+  - first:
+      213: -5440400010124209180
+    second: banner_red
+  - first:
+      213: 4569230963860705880
+    second: banner_teal
+  - first:
+      213: 3066814695000923881
+    second: barrel
+  - first:
+      213: 5636669753504339508
+    second: pot
+  - first:
+      213: 154963351776908171
+    second: jar_a
+  - first:
+      213: 7222050480860640570
+    second: jar_b
+  - first:
+      213: 2560051065643657084
+    second: candelabra
+  - first:
+      213: 4905458509517249742
+    second: box_small
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: rug_brown_v
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 48
+        width: 64
+        height: 95
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de1881cabecdb61e0800000000000000
+      internalID: -2203424687905013267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rug_green_v
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 177
+        width: 64
+        height: 95
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82eeea860ac923410800000000000000
+      internalID: 1455397842359086632
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rug_teal_v
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 177
+        width: 64
+        height: 95
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a5c60b6e3399a1570800000000000000
+      internalID: 8438225300024749146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rug_olive_h
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 80
+        width: 95
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: adde74487577560d0800000000000000
+      internalID: -3430204323407598118
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: banner_red
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 449
+        width: 48
+        height: 46
+      alignment: 9
+      pivot: {x: 0.5, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e3d388e301df74b0800000000000000
+      internalID: -5440400010124209180
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: banner_teal
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 401
+        width: 48
+        height: 46
+      alignment: 9
+      pivot: {x: 0.5, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85212a15a5b296f30800000000000000
+      internalID: 4569230963860705880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: barrel
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 352
+        width: 16
+        height: 29
+      alignment: 9
+      pivot: {x: 0.5, y: 0.05}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ee5a7767b38f8a20800000000000000
+      internalID: 3066814695000923881
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pot
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 357
+        width: 16
+        height: 19
+      alignment: 9
+      pivot: {x: 0.5, y: 0.05}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43690d5c649793e40800000000000000
+      internalID: 5636669753504339508
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jar_a
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 352
+        width: 12
+        height: 21
+      alignment: 9
+      pivot: {x: 0.5, y: 0.05}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b83dddfe85a862200800000000000000
+      internalID: 154963351776908171
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jar_b
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 352
+        width: 12
+        height: 15
+      alignment: 9
+      pivot: {x: 0.5, y: 0.05}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3533a5f5a0e93460800000000000000
+      internalID: 7222050480860640570
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: candelabra
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 400
+        width: 16
+        height: 32
+      alignment: 9
+      pivot: {x: 0.5, y: 0.05}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c77ec8661e0278320800000000000000
+      internalID: 2560051065643657084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: box_small
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 480
+        width: 32
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.05}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ecc51303680b31440800000000000000
+      internalID: 4905458509517249742
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      banner_red: -5440400010124209180
+      banner_teal: 4569230963860705880
+      barrel: 3066814695000923881
+      box_small: 4905458509517249742
+      candelabra: 2560051065643657084
+      castle_deco_0: 3112354578019768866
+      castle_deco_1: -7365738125143384490
+      castle_deco_10: 5104509231977732080
+      castle_deco_11: -7650925252933498771
+      castle_deco_12: -7494875966224967109
+      castle_deco_13: 25555934835086983
+      castle_deco_14: 419224826864422944
+      castle_deco_15: -8203275473175078388
+      castle_deco_16: 3945884693879967001
+      castle_deco_17: -4046895869852807431
+      castle_deco_18: -8642852108267991290
+      castle_deco_19: 5131191753962708399
+      castle_deco_2: -6297239174872095222
+      castle_deco_20: 7349984464871614056
+      castle_deco_21: 1810606459594407073
+      castle_deco_22: -3876790399445634662
+      castle_deco_23: -8541651918310912002
+      castle_deco_24: 6688574452489668202
+      castle_deco_25: -8362792491011611314
+      castle_deco_26: 1147141103172709670
+      castle_deco_27: 3138469025300318947
+      castle_deco_28: 2714670839300927236
+      castle_deco_29: 5766994341092523437
+      castle_deco_3: -3231579344003488757
+      castle_deco_30: 4248437981784891097
+      castle_deco_31: 5466234914866892376
+      castle_deco_32: 8169817510356018383
+      castle_deco_33: -7336353920186277084
+      castle_deco_34: 7313254221995216270
+      castle_deco_35: 4150297665895772159
+      castle_deco_36: -3970745717387862449
+      castle_deco_37: 3398200365242215478
+      castle_deco_38: 3042174393690033309
+      castle_deco_39: 1054005105071454951
+      castle_deco_4: 6291449856342907824
+      castle_deco_40: -6317193095944768811
+      castle_deco_41: 3353770078288514829
+      castle_deco_42: 2967146245922195407
+      castle_deco_43: 190103075513642166
+      castle_deco_44: -911917472977192722
+      castle_deco_45: -5585366085362016748
+      castle_deco_46: -8340553172962528643
+      castle_deco_47: 5422157193079381749
+      castle_deco_48: -3886520533497134723
+      castle_deco_49: -4515339841980552003
+      castle_deco_5: 1925916309707015858
+      castle_deco_50: -1988952114925425504
+      castle_deco_51: 687470562655416483
+      castle_deco_52: -2276663016926747662
+      castle_deco_6: -8055908221592112740
+      castle_deco_7: -7989472574721422153
+      castle_deco_8: 1311693012618005259
+      castle_deco_9: -8338756988105646946
+      jar_a: 154963351776908171
+      jar_b: 7222050480860640570
+      pot: 5636669753504339508
+      rug_brown_v: -2203424687905013267
+      rug_green_v: 1455397842359086632
+      rug_olive_h: -3430204323407598118
+      rug_teal_v: 8438225300024749146
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

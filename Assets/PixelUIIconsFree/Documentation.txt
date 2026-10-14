@@ -1,0 +1,29 @@
+Pixel UI Icons Free
+
+Documentation. 20 pixel-art icons, 16x16, each a sprite (point filtered, uncompressed, 100
+pixels per unit), a folder per category:
+
+  Icons/weapons/ (2)
+    sword, bow
+  Icons/equipment/ (2)
+    shield, helmet
+  Icons/consumables/ (2)
+    apple, potion
+  Icons/currency/ (4)
+    coin, gem, key, chest
+  Icons/resources/ (1)
+    log
+  Icons/tools/ (2)
+    pickaxe, map
+  Icons/menu/ (2)
+    gear, check
+  Icons/stats/ (3)
+    heart, mana, star
+  Icons/status/ (2)
+    poison, freeze
+
+  Demo/PixelUIIconsFreeDemo.unity   every icon by category and by name; a click shows it at 1x to 4x
+
+Use one as an Image's or a SpriteRenderer's sprite. They are made at 1x: on a canvas or camera scaled
+by whole numbers they stay crisp. The sprites import in any Unity version; the demo scene needs Unity
+6.3 or later.

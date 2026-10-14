@@ -1,0 +1,465 @@
+fileFormatVersion: 2
+guid: 356d8965cd5ce7847ada5022f3f7c7f2
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -9044884855197790677
+    second: Blood Monster_A_0
+  - first:
+      213: 850063378176994243
+    second: Blood Monster_A_1
+  - first:
+      213: 1272736640021102215
+    second: Blood Monster_A_2
+  - first:
+      213: 2855800322412599837
+    second: Blood Monster_A_3
+  - first:
+      213: 5410257564701075507
+    second: Blood Monster_A_4
+  - first:
+      213: 2125185773916986444
+    second: Blood Monster_A_5
+  - first:
+      213: 4252032457224786148
+    second: Blood Monster_A_6
+  - first:
+      213: 2837209269163534849
+    second: Blood Monster_A_7
+  - first:
+      213: 8511871956117999058
+    second: Blood Monster_A_8
+  - first:
+      213: 3937083805156714289
+    second: Blood Monster_A_9
+  - first:
+      213: -1954168303345681847
+    second: Blood Monster_A_10
+  - first:
+      213: -2119456799586951844
+    second: Blood Monster_A_11
+  - first:
+      213: 995023649124101828
+    second: Blood Monster_A_12
+  - first:
+      213: 8018706774606624584
+    second: Blood Monster_A_13
+  - first:
+      213: -540686477008748657
+    second: Blood Monster_A_14
+  - first:
+      213: 3857169954130821827
+    second: Blood Monster_A_15
+  - first:
+      213: 8253905412980491199
+    second: Blood Monster_A_16
+  - first:
+      213: -3065164400550058968
+    second: Blood Monster_A_17
+  - first:
+      213: -1946134834023133945
+    second: Blood Monster_A_18
+  - first:
+      213: -4534943748590398634
+    second: Blood Monster_A_19
+  - first:
+      213: -1541163923063765649
+    second: Blood Monster_A_20
+  - first:
+      213: -3180443278017194615
+    second: Blood Monster_A_21
+  - first:
+      213: 4363792216313556106
+    second: Blood Monster_A_22
+  - first:
+      213: 3898773688537367919
+    second: Blood Monster_A_23
+  - first:
+      213: 352693029553931202
+    second: Blood Monster_A_24
+  - first:
+      213: -5906005915336236226
+    second: Blood Monster_A_25
+  - first:
+      213: -133393410321103312
+    second: Blood Monster_A_26
+  - first:
+      213: 1291784465509692331
+    second: Blood Monster_A_27
+  - first:
+      213: -6457962993634968243
+    second: Blood Monster_A_28
+  - first:
+      213: -6162844931114839648
+    second: Blood Monster_A_29
+  - first:
+      213: -8927686562661534708
+    second: Blood Monster_A_30
+  - first:
+      213: 3489081792491607623
+    second: Blood Monster_A_31
+  - first:
+      213: -931755866288667133
+    second: Blood Monster_A_32
+  - first:
+      213: -7955672087280977632
+    second: Blood Monster_A_33
+  - first:
+      213: -4011274723166509782
+    second: Blood Monster_A_34
+  - first:
+      213: -7444684976231582482
+    second: Blood Monster_A_35
+  - first:
+      213: -4302005675916079439
+    second: Blood Monster_A_36
+  - first:
+      213: -3517330342787788804
+    second: Blood Monster_A_37
+  - first:
+      213: 9015626850547967342
+    second: Blood Monster_A_38
+  - first:
+      213: 8148822516976913087
+    second: Blood Monster_A_39
+  - first:
+      213: 8993601289487656136
+    second: Blood Monster_A_40
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Blood Monster_A_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b2e00a3652d1a7280800000000000000
+      internalID: -9044884855197790677
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Blood Monster_A_1
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3cbeecc73280ccb00800000000000000
+      internalID: 850063378176994243
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Blood Monster_A_2
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78ef4191b3ba9a110800000000000000
+      internalID: 1272736640021102215
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Blood Monster_A_3
+      rect:
+        serializedVersion: 2
+        x: 300
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1a59d63347d1a720800000000000000
+      internalID: 2855800322412599837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Blood Monster_A_4
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 338a06f1798151b40800000000000000
+      internalID: 5410257564701075507
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Blood Monster_A_5
+      rect:
+        serializedVersion: 2
+        x: 500
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c4c1900a33d2e7d10800000000000000
+      internalID: 2125185773916986444
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Blood Monster_A_6
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e0905addf0420b30800000000000000
+      internalID: 4252032457224786148
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Blood Monster_A_7
+      rect:
+        serializedVersion: 2
+        x: 700
+        y: 0
+        width: 100
+        height: 600
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10a20f15ccacf5720800000000000000
+      internalID: 2837209269163534849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5f99fbd146b94ee448a694ce2396ee3d
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Blood Monster_A_0: -9044884855197790677
+      Blood Monster_A_1: 850063378176994243
+      Blood Monster_A_2: 1272736640021102215
+      Blood Monster_A_3: 2855800322412599837
+      Blood Monster_A_4: 5410257564701075507
+      Blood Monster_A_5: 2125185773916986444
+      Blood Monster_A_6: 4252032457224786148
+      Blood Monster_A_7: 2837209269163534849
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

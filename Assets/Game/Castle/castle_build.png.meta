@@ -1,0 +1,620 @@
+fileFormatVersion: 2
+guid: 29a50033873e5f841a788a1e00d4b671
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6511590089660251578
+    second: castle_build_0
+  - first:
+      213: 8799707977395712144
+    second: castle_build_1
+  - first:
+      213: -6040588142821954857
+    second: castle_build_2
+  - first:
+      213: -3401218471964199229
+    second: castle_build_3
+  - first:
+      213: -2920408452907272006
+    second: castle_build_4
+  - first:
+      213: -2924118546071747508
+    second: castle_build_5
+  - first:
+      213: 1331308393496685807
+    second: castle_build_6
+  - first:
+      213: -7703571036088459616
+    second: castle_build_7
+  - first:
+      213: 5902265522361709101
+    second: castle_build_8
+  - first:
+      213: -5248317352566437547
+    second: castle_build_9
+  - first:
+      213: -1777720516105697698
+    second: castle_build_10
+  - first:
+      213: 8778327031878647172
+    second: castle_build_11
+  - first:
+      213: -8151035709302060563
+    second: castle_build_12
+  - first:
+      213: 8946204747151848015
+    second: castle_build_13
+  - first:
+      213: 4175710776819843842
+    second: castle_build_14
+  - first:
+      213: 5677224448799315227
+    second: castle_build_15
+  - first:
+      213: -3475851611639064359
+    second: castle_build_16
+  - first:
+      213: 1007483142430144268
+    second: castle_build_17
+  - first:
+      213: -8611800105018369800
+    second: castle_build_18
+  - first:
+      213: 6769399019025224684
+    second: castle_build_19
+  - first:
+      213: 3056758731875150799
+    second: castle_build_20
+  - first:
+      213: 7637641646928936753
+    second: castle_build_21
+  - first:
+      213: 412451276337794333
+    second: castle_build_22
+  - first:
+      213: 1708612851402288501
+    second: castle_build_23
+  - first:
+      213: -5573516236198166526
+    second: castle_build_24
+  - first:
+      213: 7853901137311696110
+    second: castle_build_25
+  - first:
+      213: 7077199805566558818
+    second: castle_build_26
+  - first:
+      213: 686752649913390595
+    second: castle_build_27
+  - first:
+      213: -6812230005006940019
+    second: castle_build_28
+  - first:
+      213: 3017724715416928450
+    second: castle_build_29
+  - first:
+      213: -2675900082057805269
+    second: castle_build_30
+  - first:
+      213: -3539011052947206414
+    second: castle_build_31
+  - first:
+      213: -5181638442120530896
+    second: castle_build_32
+  - first:
+      213: 3339193590910667077
+    second: castle_build_33
+  - first:
+      213: -2076239878656052800
+    second: castle_build_34
+  - first:
+      213: 9117919409002512648
+    second: castle_build_35
+  - first:
+      213: -2501829162139269185
+    second: castle_build_36
+  - first:
+      213: -5695927645156442372
+    second: castle_build_37
+  - first:
+      213: 2637897874888155232
+    second: castle_build_38
+  - first:
+      213: -3118176784011064476
+    second: castle_build_39
+  - first:
+      213: -269766894994443337
+    second: castle_build_40
+  - first:
+      213: -5070727096756530069
+    second: castle_build_41
+  - first:
+      213: -4527940359760022061
+    second: castle_build_42
+  - first:
+      213: 4190139531720568529
+    second: castle_build_43
+  - first:
+      213: 9200581922280957209
+    second: floor_brown
+  - first:
+      213: 1998193551978131357
+    second: floor_teal
+  - first:
+      213: -7428182108653377397
+    second: floor_brown_big
+  - first:
+      213: 8820154983422592920
+    second: wall_front
+  - first:
+      213: 2828745749936635895
+    second: wall_side
+  - first:
+      213: -8143896937238859931
+    second: window_big
+  - first:
+      213: -3838199492394576481
+    second: arch_door
+  - first:
+      213: 1276812009663207130
+    second: pillar_thick
+  - first:
+      213: 8576606959531429986
+    second: pillar_thin
+  - first:
+      213: 8587509716919254989
+    second: bench
+  - first:
+      213: -2906442001405320323
+    second: water_pool
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: floor_brown
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 320
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 915ef64f2880faf70800000000000000
+      internalID: 9200581922280957209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: floor_teal
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 320
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d9fe12ad2720bbb10800000000000000
+      internalID: 1998193551978131357
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: floor_brown_big
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 176
+        width: 128
+        height: 128
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b88adc67abbc9e890800000000000000
+      internalID: -7428182108653377397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: wall_front
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 672
+        width: 128
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8978bcae93c776a70800000000000000
+      internalID: 8820154983422592920
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: wall_side
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 672
+        width: 16
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ff7ed0b549b14720800000000000000
+      internalID: 2828745749936635895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: window_big
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 560
+        width: 96
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56f6c7042e01bfe80800000000000000
+      internalID: -8143896937238859931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: arch_door
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 432
+        width: 80
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f959cb6b5e9fbbac0800000000000000
+      internalID: -3838199492394576481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pillar_thick
+      rect:
+        serializedVersion: 2
+        x: 459
+        y: 224
+        width: 44
+        height: 80
+      alignment: 9
+      pivot: {x: 0.5, y: 0.05}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad69de802c528b110800000000000000
+      internalID: 1276812009663207130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pillar_thin
+      rect:
+        serializedVersion: 2
+        x: 410
+        y: 224
+        width: 29
+        height: 80
+      alignment: 9
+      pivot: {x: 0.5, y: 0.05}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2609301c69a360770800000000000000
+      internalID: 8576606959531429986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bench
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 176
+        width: 64
+        height: 32
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dcfff26c696fc2770800000000000000
+      internalID: 8587509716919254989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: water_pool
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 199
+        width: 124
+        height: 98
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d73e5f1166e3aa7d0800000000000000
+      internalID: -2906442001405320323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      arch_door: -3838199492394576481
+      bench: 8587509716919254989
+      castle_build_0: 6511590089660251578
+      castle_build_1: 8799707977395712144
+      castle_build_10: -1777720516105697698
+      castle_build_11: 8778327031878647172
+      castle_build_12: -8151035709302060563
+      castle_build_13: 8946204747151848015
+      castle_build_14: 4175710776819843842
+      castle_build_15: 5677224448799315227
+      castle_build_16: -3475851611639064359
+      castle_build_17: 1007483142430144268
+      castle_build_18: -8611800105018369800
+      castle_build_19: 6769399019025224684
+      castle_build_2: -6040588142821954857
+      castle_build_20: 3056758731875150799
+      castle_build_21: 7637641646928936753
+      castle_build_22: 412451276337794333
+      castle_build_23: 1708612851402288501
+      castle_build_24: -5573516236198166526
+      castle_build_25: 7853901137311696110
+      castle_build_26: 7077199805566558818
+      castle_build_27: 686752649913390595
+      castle_build_28: -6812230005006940019
+      castle_build_29: 3017724715416928450
+      castle_build_3: -3401218471964199229
+      castle_build_30: -2675900082057805269
+      castle_build_31: -3539011052947206414
+      castle_build_32: -5181638442120530896
+      castle_build_33: 3339193590910667077
+      castle_build_34: -2076239878656052800
+      castle_build_35: 9117919409002512648
+      castle_build_36: -2501829162139269185
+      castle_build_37: -5695927645156442372
+      castle_build_38: 2637897874888155232
+      castle_build_39: -3118176784011064476
+      castle_build_4: -2920408452907272006
+      castle_build_40: -269766894994443337
+      castle_build_41: -5070727096756530069
+      castle_build_42: -4527940359760022061
+      castle_build_43: 4190139531720568529
+      castle_build_5: -2924118546071747508
+      castle_build_6: 1331308393496685807
+      castle_build_7: -7703571036088459616
+      castle_build_8: 5902265522361709101
+      castle_build_9: -5248317352566437547
+      floor_brown: 9200581922280957209
+      floor_brown_big: -7428182108653377397
+      floor_teal: 1998193551978131357
+      pillar_thick: 1276812009663207130
+      pillar_thin: 8576606959531429986
+      wall_front: 8820154983422592920
+      wall_side: 2828745749936635895
+      water_pool: -2906442001405320323
+      window_big: -8143896937238859931
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
