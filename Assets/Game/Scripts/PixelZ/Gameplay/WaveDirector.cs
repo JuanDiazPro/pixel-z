@@ -22,7 +22,7 @@ public class WaveDirector : MonoBehaviour
 
     private EnemyDef[] pool;
     private EnemyDef bossDef;
-    private List<Vector2> spawnPoints;
+    private List<NavPoint> spawnPoints;
     private Vector2? bossArena;
     private bool introBossPending;
     private int mapIndex;
@@ -32,7 +32,7 @@ public class WaveDirector : MonoBehaviour
 
     private const float BreakTime = 10f;
 
-    public void Init(int map, EnemyDef[] enemyPool, EnemyDef boss, List<Vector2> points, float introTime, int bossEveryWaves, bool startWithBoss = false, Vector2? arena = null)
+    public void Init(int map, EnemyDef[] enemyPool, EnemyDef boss, List<NavPoint> points, float introTime, int bossEveryWaves, bool startWithBoss = false, Vector2? arena = null)
     {
         mapIndex = map;
         LocalWave = map == 1 ? GameSession.RuinsWave : GameSession.CastleWave;   // continúa donde se quedó
@@ -184,31 +184,37 @@ public class WaveDirector : MonoBehaviour
         int w = LocalWave;
         // Al principio aparecen cerca para no tener que buscarlos; luego desde más lejos y de todas partes.
         float maxDist = Mathf.Min(8f + w, 16f);
-        Enemy.Spawn(def, FindSpawnPoint(player.transform.position, 5.5f, maxDist), HpMult(w), SpeedMult(w), AttackMult(w));
+        Enemy.Spawn(def, FindSpawnPoint(player, 5.5f, maxDist), HpMult(w), SpeedMult(w), AttackMult(w));
     }
 
     private void SpawnBoss(float hpMult, float speedMult, Vector2? at)
     {
         PlayerController player = PlayerController.Instance;
-        Vector2 pos = at ?? FindSpawnPoint(player.transform.position, 7f, 12f);
-        Boss = Enemy.Spawn(bossDef, pos, hpMult, speedMult, 1f);
+        NavPoint point = at.HasValue && FlowField.Instance != null ? new NavPoint(at.Value, FlowField.Instance.DefaultLayer) : FindSpawnPoint(player, 7f, 12f);
+        Boss = Enemy.Spawn(bossDef, point, hpMult, speedMult, 1f);
         FX.Shake(0.3f, 0.6f);
     }
 
-    private Vector2 FindSpawnPoint(Vector2 playerPos, float minDist, float maxDist)
+    // Punto de aparición a la distancia pedida y, si se puede, desde el que el enemigo llegue andando hasta el jugador.
+    private NavPoint FindSpawnPoint(PlayerController player, float minDist, float maxDist)
     {
-        if (spawnPoints == null || spawnPoints.Count == 0) return playerPos + Random.insideUnitCircle.normalized * minDist;
+        Vector2 playerPos = player.transform.position;
+        if (spawnPoints == null || spawnPoints.Count == 0)
+            return new NavPoint(playerPos + Random.insideUnitCircle.normalized * minDist, player.gameObject.layer);
 
-        for (int attempt = 0; attempt < 30; attempt++)
+        FlowField field = FlowField.Instance;
+        bool Reachable(NavPoint p) => field == null || field.IsReachable(p);
+
+        for (int attempt = 0; attempt < 40; attempt++)
         {
-            Vector2 p = spawnPoints[Random.Range(0, spawnPoints.Count)];
-            float d = Vector2.Distance(p, playerPos);
-            if (d >= minDist && d <= maxDist) return p;
+            NavPoint p = spawnPoints[Random.Range(0, spawnPoints.Count)];
+            float d = Vector2.Distance(p.position, playerPos);
+            if (d >= minDist && d <= maxDist && Reachable(p)) return p;
         }
-        for (int attempt = 0; attempt < 30; attempt++)
+        for (int attempt = 0; attempt < 40; attempt++)
         {
-            Vector2 p = spawnPoints[Random.Range(0, spawnPoints.Count)];
-            if (Vector2.Distance(p, playerPos) >= 4f) return p;
+            NavPoint p = spawnPoints[Random.Range(0, spawnPoints.Count)];
+            if (Vector2.Distance(p.position, playerPos) >= 4f && Reachable(p)) return p;
         }
         return spawnPoints[Random.Range(0, spawnPoints.Count)];
     }

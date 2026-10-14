@@ -1,173 +1,291 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
-// Mapa de distancias hacia el jugador sobre las celdas transitables (BFS).
-// Los enemigos lo siguen para rodear muros, árboles, cofres y muebles en lugar de quedarse atascados.
+// Punto del mapa en un nivel concreto (capa física "Layer 1/2/3").
+public struct NavPoint
+{
+    public Vector2 position;
+    public int layer;
+
+    public NavPoint(Vector2 position, int layer)
+    {
+        this.position = position;
+        this.layer = layer;
+    }
+}
+
+// Navegación por niveles para los enemigos.
+// Divide el mapa en celdas de medio tile, una rejilla por nivel (capa física). Una celda es transitable si hay
+// suelo y no choca con nada de ese nivel, igual que el jugador. Las escaleras unen niveles: cruzar su línea
+// cambia la capa del enemigo (StairsLayerTrigger de Cainos), así que el camino las usa como "puentes".
+// Cada pocos frames se calcula la distancia de cada celda al jugador (BFS) y los enemigos bajan por ella.
 public class FlowField : MonoBehaviour
 {
     public static FlowField Instance { get; private set; }
 
-    public List<Vector2> WalkableCenters { get; } = new List<Vector2>();
+    public const float Cell = 0.5f;
 
-    private GridLayout grid;
-    private BoundsInt bounds;
-    private bool[,] walkable;
-    private int[,] dist;
+    public List<NavPoint> SpawnPoints { get; } = new List<NavPoint>();
+    public int DefaultLayer => layers != null && layers.Length > 0 ? layers[0] : 0;
+
+    private int[] layers;
+    private int levels, w, h;
+    private Vector2 origin;
+    private bool[] walk;
+    private byte[] pass;                     // bits: 1 = +x, 2 = -x, 4 = +y, 8 = -y
+    private readonly Dictionary<int, List<int>> links = new Dictionary<int, List<int>>();
+    private int[] dist;
+    private readonly Queue<int> queue = new Queue<int>();
+    private readonly Collider2D[] hits = new Collider2D[8];
+    private readonly RaycastHit2D[] rayHits = new RaycastHit2D[8];
     private float timer;
-    private Vector2Int lastTarget = new Vector2Int(int.MinValue, 0);
-    private readonly Queue<Vector2Int> queue = new Queue<Vector2Int>();
+    private int lastTarget = -1;
 
-    private static readonly Vector2Int[] Neighbours =
+    // Enlace entre dos niveles a través de una escalera (punto abajo ↔ punto arriba).
+    public struct StairLink
     {
-        new Vector2Int(1, 0), new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(0, -1),
-        new Vector2Int(1, 1), new Vector2Int(-1, 1), new Vector2Int(1, -1), new Vector2Int(-1, -1),
-    };
-
-    // Castillo: suelo sin muro y sin muebles con colisión.
-    public void Build(Tilemap floorMap, Tilemap wallMap, LayerMask obstacleMask)
-    {
-        floorMap.CompressBounds();
-        var cells = new HashSet<Vector3Int>();
-        foreach (Vector3Int cell in floorMap.cellBounds.allPositionsWithin)
-        {
-            if (!floorMap.HasTile(cell) || (wallMap != null && wallMap.HasTile(cell))) continue;
-            if (IsBlocked(floorMap.GetCellCenterWorld(cell), obstacleMask)) continue;
-            cells.Add(cell);
-        }
-        Build(floorMap, cells);
+        public Vector2 lowerPoint, upperPoint;
+        public int lowerLayer, upperLayer;
     }
 
-    // Construcción genérica a partir de un conjunto de celdas de la rejilla indicada.
-    public void Build(GridLayout layout, HashSet<Vector3Int> cells)
+    public void Build(Rect area, int[] physicsLayers, Func<int, Vector2, bool> isGround, Func<int, Vector2, bool> canSpawn, List<StairLink> stairLinks)
     {
         Instance = this;
-        grid = layout;
+        layers = physicsLayers;
+        levels = layers.Length;
+        origin = area.min;
+        w = Mathf.CeilToInt(area.width / Cell);
+        h = Mathf.CeilToInt(area.height / Cell);
+        int count = levels * w * h;
+        walk = new bool[count];
+        pass = new byte[count];
+        dist = new int[count];
+        links.Clear();
+        SpawnPoints.Clear();
 
-        if (cells.Count == 0)
+        // 1) Celdas transitables por nivel.
+        for (int l = 0; l < levels; l++)
         {
-            bounds = new BoundsInt(0, 0, 0, 1, 1, 1);
-            walkable = new bool[1, 1];
-            dist = new int[1, 1];
-            return;
+            ContactFilter2D filter = FilterFor(layers[l]);
+            for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+            {
+                Vector2 p = CenterOf(x, y);
+                if (!isGround(l, p) || Blocked(p, filter)) continue;
+                walk[Index(l, x, y)] = true;
+                if (canSpawn(l, p)) SpawnPoints.Add(new NavPoint(p, layers[l]));
+            }
         }
 
-        int minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
-        foreach (Vector3Int c in cells)
+        // 2) Conexiones entre celdas vecinas sin nada en medio (bordes finos, barandillas de escaleras...).
+        for (int l = 0; l < levels; l++)
         {
-            minX = Mathf.Min(minX, c.x); minY = Mathf.Min(minY, c.y);
-            maxX = Mathf.Max(maxX, c.x); maxY = Mathf.Max(maxY, c.y);
+            ContactFilter2D filter = FilterFor(layers[l]);
+            for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+            {
+                int i = Index(l, x, y);
+                if (!walk[i]) continue;
+                Vector2 p = CenterOf(x, y);
+                if (x + 1 < w && walk[i + 1] && Clear(p, CenterOf(x + 1, y), filter))
+                {
+                    pass[i] |= 1;
+                    pass[i + 1] |= 2;
+                }
+                if (y + 1 < h && walk[i + w] && Clear(p, CenterOf(x, y + 1), filter))
+                {
+                    pass[i] |= 4;
+                    pass[i + w] |= 8;
+                }
+            }
         }
-        bounds = new BoundsInt(minX, minY, 0, maxX - minX + 1, maxY - minY + 1, 1);
-        walkable = new bool[bounds.size.x, bounds.size.y];
-        dist = new int[bounds.size.x, bounds.size.y];
 
-        WalkableCenters.Clear();
-        foreach (Vector3Int c in cells)
+        // 3) Escaleras.
+        if (stairLinks != null)
         {
-            walkable[c.x - minX, c.y - minY] = true;
-            WalkableCenters.Add(grid.CellToWorld(c) + grid.cellSize * 0.5f);
+            foreach (StairLink s in stairLinks)
+            {
+                int a = NearestWalkable(LevelOf(s.lowerLayer), s.lowerPoint);
+                int b = NearestWalkable(LevelOf(s.upperLayer), s.upperPoint);
+                if (a < 0 || b < 0) continue;
+                AddLink(a, b);
+                AddLink(b, a);
+            }
         }
+
+        for (int i = 0; i < dist.Length; i++) dist[i] = int.MaxValue;
     }
 
-    public static bool IsBlocked(Vector2 center, LayerMask mask)
+    private void AddLink(int from, int to)
     {
-        foreach (Collider2D hit in Physics2D.OverlapBoxAll(center, new Vector2(0.7f, 0.7f), 0f, mask))
-        {
-            if (hit.isTrigger || hit is CompositeCollider2D || hit is TilemapCollider2D) continue;
-            if (hit.attachedRigidbody != null && hit.attachedRigidbody.bodyType == RigidbodyType2D.Dynamic) continue;
-            return true;
-        }
+        if (!links.TryGetValue(from, out List<int> list)) links[from] = list = new List<int>();
+        if (!list.Contains(to)) list.Add(to);
+    }
+
+    private static ContactFilter2D FilterFor(int layer)
+    {
+        var filter = new ContactFilter2D();
+        filter.SetLayerMask(Physics2D.GetLayerCollisionMask(layer));
+        filter.useTriggers = false;
+        return filter;
+    }
+
+    private bool Blocked(Vector2 p, ContactFilter2D filter)
+    {
+        int n = Physics2D.OverlapBox(p, new Vector2(0.36f, 0.36f), 0f, filter, hits);
+        for (int i = 0; i < n; i++)
+            if (IsStatic(hits[i])) return true;
         return false;
     }
+
+    private bool Clear(Vector2 a, Vector2 b, ContactFilter2D filter)
+    {
+        int n = Physics2D.Linecast(a, b, filter, rayHits);
+        for (int i = 0; i < n; i++)
+            if (IsStatic(rayHits[i].collider)) return false;
+        return true;
+    }
+
+    // Personajes y enemigos (cuerpos dinámicos) no cuentan como obstáculos.
+    private static bool IsStatic(Collider2D c) =>
+        c != null && !c.isTrigger && (c.attachedRigidbody == null || c.attachedRigidbody.bodyType != RigidbodyType2D.Dynamic);
 
     private void OnDestroy()
     {
         if (Instance == this) Instance = null;
     }
 
+    // ---------- Distancias al jugador ----------
+
     private void Update()
     {
         PlayerController player = PlayerController.Instance;
-        if (player == null || walkable == null) return;
+        if (player == null || walk == null) return;
 
         timer -= Time.deltaTime;
-        Vector2Int target = ToIndex(player.transform.position);
+        int target = NearestWalkable(LevelOf(player.gameObject.layer), player.transform.position);
         if (timer > 0f && target == lastTarget) return;
-        timer = 0.25f;
+        timer = 0.2f;
         lastTarget = target;
         Recompute(target);
     }
 
-    private void Recompute(Vector2Int target)
+    private void Recompute(int target)
     {
-        int w = bounds.size.x, h = bounds.size.y;
-        for (int x = 0; x < w; x++)
-        for (int y = 0; y < h; y++)
-            dist[x, y] = int.MaxValue;
-
-        // Si el jugador está sobre una celda no transitable (p. ej. pegado a un mueble), parte de la vecina más cercana.
-        if (!InGrid(target) || !walkable[target.x, target.y])
-        {
-            bool found = false;
-            foreach (Vector2Int off in Neighbours)
-            {
-                Vector2Int n = target + off;
-                if (InGrid(n) && walkable[n.x, n.y]) { target = n; found = true; break; }
-            }
-            if (!found) return;
-        }
+        for (int i = 0; i < dist.Length; i++) dist[i] = int.MaxValue;
+        if (target < 0) return;
 
         queue.Clear();
-        dist[target.x, target.y] = 0;
+        dist[target] = 0;
         queue.Enqueue(target);
-
         while (queue.Count > 0)
         {
-            Vector2Int c = queue.Dequeue();
-            int d = dist[c.x, c.y] + 1;
-            for (int i = 0; i < 4; i++)
-            {
-                Vector2Int n = c + Neighbours[i];
-                if (!InGrid(n) || !walkable[n.x, n.y] || dist[n.x, n.y] <= d) continue;
-                dist[n.x, n.y] = d;
-                queue.Enqueue(n);
-            }
+            int c = queue.Dequeue();
+            int d = dist[c] + 1;
+            byte p = pass[c];
+            if ((p & 1) != 0) Visit(c + 1, d);
+            if ((p & 2) != 0) Visit(c - 1, d);
+            if ((p & 4) != 0) Visit(c + w, d);
+            if ((p & 8) != 0) Visit(c - w, d);
+            if (links.TryGetValue(c, out List<int> list))
+                foreach (int n in list) Visit(n, d);
         }
     }
 
-    // Dirección a seguir desde 'from' para acercarse al jugador. Si no hay camino, va en línea recta.
-    public Vector2 DirectionTo(Vector2 from, Vector2 target)
+    private void Visit(int n, int d)
+    {
+        if (dist[n] <= d) return;
+        dist[n] = d;
+        queue.Enqueue(n);
+    }
+
+    public bool IsReachable(NavPoint point)
+    {
+        int n = NearestWalkable(LevelOf(point.layer), point.position);
+        return n >= 0 && dist[n] != int.MaxValue;
+    }
+
+    // Dirección a seguir desde 'from' (en la capa física 'layer') para acercarse al jugador.
+    public Vector2 DirectionTo(Vector2 from, int layer, Vector2 target)
     {
         Vector2 straight = (target - from).normalized;
-        Vector2Int c = ToIndex(from);
-        if (!InGrid(c) || dist[c.x, c.y] == int.MaxValue || dist[c.x, c.y] <= 1) return straight;
+        int level = LevelOf(layer);
+        int n = NearestWalkable(level, from);
+        if (n < 0 || dist[n] == int.MaxValue || dist[n] <= 2) return straight;
 
-        int best = dist[c.x, c.y];
-        Vector2Int bestCell = c;
-        foreach (Vector2Int off in Neighbours)
+        int best = n;
+        int bestDist = dist[n];
+        int x = n % w;
+        int y = (n / w) % h;
+        byte p = pass[n];
+
+        void Try(int candidate)
         {
-            Vector2Int n = c + off;
-            if (!InGrid(n) || !walkable[n.x, n.y]) continue;
-            // No cortar esquinas en diagonal.
-            if (off.x != 0 && off.y != 0 && (!walkable[c.x + off.x, c.y] || !walkable[c.x, c.y + off.y])) continue;
-            if (dist[n.x, n.y] < best)
+            if (dist[candidate] < bestDist)
             {
-                best = dist[n.x, n.y];
-                bestCell = n;
+                bestDist = dist[candidate];
+                best = candidate;
             }
         }
-        if (bestCell == c) return straight;
 
-        Vector2 next = grid.CellToWorld(new Vector3Int(bounds.xMin + bestCell.x, bounds.yMin + bestCell.y, 0)) + grid.cellSize * 0.5f;
-        return (next - from).normalized;
+        if ((p & 1) != 0) Try(n + 1);
+        if ((p & 2) != 0) Try(n - 1);
+        if ((p & 4) != 0) Try(n + w);
+        if ((p & 8) != 0) Try(n - w);
+        // Diagonales sólo si ambos lados están libres (no cortar esquinas).
+        if ((p & 1) != 0 && (p & 4) != 0 && (pass[n + 1] & 4) != 0 && (pass[n + w] & 1) != 0) Try(n + 1 + w);
+        if ((p & 2) != 0 && (p & 4) != 0 && (pass[n - 1] & 4) != 0 && (pass[n + w] & 2) != 0) Try(n - 1 + w);
+        if ((p & 1) != 0 && (p & 8) != 0 && (pass[n + 1] & 8) != 0 && (pass[n - w] & 1) != 0) Try(n + 1 - w);
+        if ((p & 2) != 0 && (p & 8) != 0 && (pass[n - 1] & 8) != 0 && (pass[n - w] & 2) != 0) Try(n - 1 - w);
+        // Escaleras: caminar hacia la celda del otro nivel cruza la línea de la escalera y cambia de capa.
+        if (links.TryGetValue(n, out List<int> list))
+            foreach (int other in list) Try(other);
+
+        if (best == n) return straight;
+        int bx = best % w;
+        int by = (best / w) % h;
+        Vector2 dir = CenterOf(bx, by) - from;
+        return dir.sqrMagnitude > 0.0001f ? dir.normalized : straight;
     }
 
-    private Vector2Int ToIndex(Vector2 world)
+    // ---------- Utilidades de rejilla ----------
+
+    private int LevelOf(int layer)
     {
-        Vector3Int cell = grid.WorldToCell(world);
-        return new Vector2Int(cell.x - bounds.xMin, cell.y - bounds.yMin);
+        if (layers == null) return -1;
+        for (int i = 0; i < layers.Length; i++)
+            if (layers[i] == layer) return i;
+        return layers.Length == 1 ? 0 : -1;
     }
 
-    private bool InGrid(Vector2Int c) => c.x >= 0 && c.y >= 0 && c.x < bounds.size.x && c.y < bounds.size.y;
+    private Vector2 CenterOf(int x, int y) => origin + new Vector2((x + 0.5f) * Cell, (y + 0.5f) * Cell);
+
+    private int Index(int l, int x, int y) => (l * h + y) * w + x;
+
+    // Celda transitable más cercana a una posición (la propia o una vecina), o -1.
+    private int NearestWalkable(int level, Vector2 pos)
+    {
+        if (level < 0 || walk == null) return -1;
+        int cx = Mathf.FloorToInt((pos.x - origin.x) / Cell);
+        int cy = Mathf.FloorToInt((pos.y - origin.y) / Cell);
+        int best = -1;
+        float bestD = float.MaxValue;
+        for (int r = 0; r <= 2 && best < 0; r++)
+        for (int dy = -r; dy <= r; dy++)
+        for (int dx = -r; dx <= r; dx++)
+        {
+            int x = cx + dx, y = cy + dy;
+            if (x < 0 || y < 0 || x >= w || y >= h) continue;
+            int i = Index(level, x, y);
+            if (!walk[i]) continue;
+            float d = (CenterOf(x, y) - pos).sqrMagnitude;
+            if (d < bestD)
+            {
+                bestD = d;
+                best = i;
+            }
+        }
+        return best;
+    }
 }

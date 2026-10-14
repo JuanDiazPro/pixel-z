@@ -38,14 +38,22 @@ public class Enemy : MonoBehaviour
     private SpriteRenderer body;
     private SpriteAnimator anim;
     private CharacterArt art;
+    private SpriteRenderer rootRenderer;
     private Transform barRoot, barFill;
 
-    public static Enemy Spawn(EnemyDef def, Vector2 position, float hpMult, float speedMult, float attackSpeedMult)
+    // Los enemigos usan la misma capa física que el nivel donde aparecen (Layer 1/2/3), como el jugador:
+    // chocan con muros, props y bordes de ese nivel y cambian de nivel al cruzar las escaleras.
+    public static Enemy Spawn(EnemyDef def, NavPoint point, float hpMult, float speedMult, float attackSpeedMult)
     {
+        Vector2 position = point.position;
         var go = new GameObject("Enemy - " + def.name);
         go.transform.position = position;
-        int layer = LayerMask.NameToLayer("Enemy");
-        if (layer >= 0) go.layer = layer;
+        go.layer = point.layer;
+        string sortingLayer = SortingLayerFor(point.layer);
+
+        // SpriteRenderer vacío en la raíz: las escaleras de Cainos lo usan para cambiar el sorting layer.
+        var rootSr = go.AddComponent<SpriteRenderer>();
+        rootSr.sortingLayerName = sortingLayer;
 
         var rb = go.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
@@ -58,7 +66,7 @@ public class Enemy : MonoBehaviour
         col.offset = new Vector2(0f, 0.12f * def.scale);
 
         var group = go.AddComponent<SortingGroup>();
-        group.sortingLayerName = PlayerController.Instance != null ? PlayerController.Instance.SortingLayer : "Layer 1";
+        group.sortingLayerName = sortingLayer;
         group.sortingOrder = PlayerController.Instance != null ? PlayerController.Instance.SortingOrder : 2;
 
         var visual = new GameObject("Visual");
@@ -74,6 +82,7 @@ public class Enemy : MonoBehaviour
         e.rb = rb;
         e.col = col;
         e.group = group;
+        e.rootRenderer = rootSr;
         e.body = sr;
         e.anim = anim;
         e.art = PixelZDatabase.I.Art(def.art);
@@ -86,6 +95,11 @@ public class Enemy : MonoBehaviour
         e.anim.Play(e.art.idle, 8f, true);
         All.Add(e);
 
+        // Sin empujarse con el jugador: le persiguen y le pegan, pero no le bloquean el paso.
+        if (PlayerController.Instance != null)
+            foreach (Collider2D pc in PlayerController.Instance.GetComponents<Collider2D>())
+                Physics2D.IgnoreCollision(col, pc);
+
         FX.Ring(position + Vector2.up * 0.2f, def.boss ? new Color(1f, 0.2f, 0.3f, 0.9f) : new Color(0.6f, 0.2f, 0.8f, 0.8f),
                 0.3f, def.boss ? 5f : 1.6f, 0.5f, group.sortingLayerName);
         return e;
@@ -94,6 +108,14 @@ public class Enemy : MonoBehaviour
     private void OnDestroy()
     {
         All.Remove(this);
+    }
+
+    private static string SortingLayerFor(int physicsLayer)
+    {
+        string name = LayerMask.LayerToName(physicsLayer);
+        foreach (SortingLayer l in SortingLayer.layers)
+            if (l.name == name) return name;
+        return PlayerController.Instance != null ? PlayerController.Instance.SortingLayer : "Layer 1";
     }
 
     private void CreateHealthBar()
@@ -132,7 +154,8 @@ public class Enemy : MonoBehaviour
         stun -= Time.deltaTime;
 
         PlayerController player = PlayerController.Instance;
-        if (player != null) group.sortingLayerName = player.SortingLayer;
+        // Sigue al sorting layer que ponen las escaleras al cambiar de nivel.
+        if (rootRenderer != null && group.sortingLayerID != rootRenderer.sortingLayerID) group.sortingLayerID = rootRenderer.sortingLayerID;
 
         UpdateFlash();
         UpdateHealthBar();
@@ -184,7 +207,7 @@ public class Enemy : MonoBehaviour
         {
             Vector2 toPlayer = (Vector2)player.transform.position - (Vector2)transform.position;
             float dist = toPlayer.magnitude;
-            Vector2 dir = FlowField.Instance != null ? FlowField.Instance.DirectionTo(transform.position, player.transform.position) : toPlayer.normalized;
+            Vector2 dir = FlowField.Instance != null ? FlowField.Instance.DirectionTo(transform.position, gameObject.layer, player.transform.position) : toPlayer.normalized;
 
             if (Def.ranged)
             {
@@ -282,7 +305,8 @@ public class Enemy : MonoBehaviour
                 {
                     Vector2 facing = body.flipX ? Vector2.left : Vector2.right;
                     Vector2 hitPoint = (Vector2)transform.position + facing * 0.3f * Def.scale;
-                    if (Vector2.Distance(player.transform.position, hitPoint) <= Def.attackRange + 0.2f)
+                    // Sólo golpea si está en el mismo nivel (no a través de un desnivel).
+                    if (gameObject.layer == player.gameObject.layer && Vector2.Distance(player.transform.position, hitPoint) <= Def.attackRange + 0.2f)
                         player.TakeHit(Def.damage, transform.position);
                     if (Def.boss) FX.Shake(0.12f, 0.15f);
                 }

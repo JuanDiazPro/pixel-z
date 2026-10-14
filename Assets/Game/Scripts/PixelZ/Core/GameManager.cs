@@ -56,7 +56,7 @@ public class GameManager : MonoBehaviour
         PlayerController player = SpawnPlayer();
         SetupCamera(player);
 
-        List<Vector2> spawnPoints = map == 1 ? SetupRuins() : SetupCastle();
+        List<NavPoint> spawnPoints = map == 1 ? SetupRuins() : SetupCastle();
 
         GameHUD.Create();
         menus = GameMenus.Create();
@@ -89,21 +89,10 @@ public class GameManager : MonoBehaviour
 
     // ---------- Montaje ----------
 
+    // Los enemigos usan las mismas capas físicas que el jugador (Layer 1/2/3), así que chocan con
+    // muros, props y bordes igual que él. En el castillo las flechas y bolas de fuego paran en los muros.
     private void SetupPhysicsLayers()
     {
-        int enemy = LayerMask.NameToLayer("Enemy");
-        if (enemy < 0)
-        {
-            Debug.LogWarning("[Pixel Z] Falta la capa 'Enemy'. Ejecuta  Pixel Z > Configurar juego.");
-            return;
-        }
-
-        // Los enemigos sólo chocan entre sí (para no amontonarse) y, en el castillo, con muros y muebles.
-        for (int i = 0; i < 32; i++)
-        {
-            bool collide = i == enemy || (MapIndex == 2 && i == 0);
-            Physics2D.IgnoreLayerCollision(enemy, i, !collide);
-        }
         ProjectileWallMask = MapIndex == 2 ? 1 << 0 : 0;
     }
 
@@ -146,10 +135,8 @@ public class GameManager : MonoBehaviour
     }
 
     // Mapa 1: cofre que vende la llave y puerta del sur que la exige.
-    private List<Vector2> SetupRuins()
+    private List<NavPoint> SetupRuins()
     {
-        ProjectileWallMask = 0;
-
         GameObject chestGo = null;
         foreach (SpriteRenderer sr in FindObjectsByType<SpriteRenderer>())
             if (sr.name.Contains("Chest")) { chestGo = sr.gameObject; break; }
@@ -179,134 +166,121 @@ public class GameManager : MonoBehaviour
         }
 
         Breakable.SetupAll();
-        BuildEnemyObstacles();
-        return BuildRuinsFlowField();
+        return BuildRuinsNavigation();
     }
 
-    // Los enemigos sólo chocan con la capa Enemy: se crea una copia de cada colisión de props
-    // (árboles, cofre, estatuas, pilares, pozo...) en esa capa para que no los atraviesen.
-    private void BuildEnemyObstacles()
+    // Navegación de las Ruinas: 3 niveles (Layer 1/2/3) unidos por las escaleras de Cainos.
+    private List<NavPoint> BuildRuinsNavigation()
     {
-        int enemyLayer = LayerMask.NameToLayer("Enemy");
-        if (enemyLayer < 0) return;
-
-        var root = new GameObject("Enemy Obstacles").transform;
-        foreach (Collider2D c in FindObjectsByType<Collider2D>())
-        {
-            if (c.isTrigger || c is CompositeCollider2D || c is TilemapCollider2D || c.gameObject.layer == enemyLayer) continue;
-            if (c.attachedRigidbody != null && c.attachedRigidbody.bodyType == RigidbodyType2D.Dynamic) continue;
-            if (!IsProp(c.transform)) continue;   // los bordes de escaleras/plataformas no: los enemigos cruzan niveles
-
-            var go = new GameObject(c.name);
-            go.layer = enemyLayer;
-            go.transform.SetParent(root, false);
-            go.transform.SetPositionAndRotation(c.transform.position, c.transform.rotation);
-            go.transform.localScale = c.transform.lossyScale;
-
-            switch (c)
-            {
-                case BoxCollider2D b:
-                    var nb = go.AddComponent<BoxCollider2D>();
-                    nb.size = b.size;
-                    nb.offset = b.offset;
-                    break;
-                case CircleCollider2D ci:
-                    var nc = go.AddComponent<CircleCollider2D>();
-                    nc.radius = ci.radius;
-                    nc.offset = ci.offset;
-                    break;
-                case CapsuleCollider2D ca:
-                    var ncap = go.AddComponent<CapsuleCollider2D>();
-                    ncap.size = ca.size;
-                    ncap.offset = ca.offset;
-                    ncap.direction = ca.direction;
-                    break;
-                case PolygonCollider2D po:
-                    var np = go.AddComponent<PolygonCollider2D>();
-                    np.offset = po.offset;
-                    np.pathCount = po.pathCount;
-                    for (int i = 0; i < po.pathCount; i++) np.SetPath(i, po.GetPath(i));
-                    break;
-                default:
-                    Destroy(go);
-                    continue;
-            }
-
-            // Si el prop se puede romper, su copia desaparece con él.
-            Breakable breakable = c.GetComponentInParent<Breakable>();
-            if (breakable != null) breakable.AddObstacleCopy(go);
-        }
-    }
-
-    private static bool IsProp(Transform t)
-    {
-        for (; t != null; t = t.parent)
-        {
-            if (t.name.StartsWith("PF Struct")) return false;
-            if (t.name.StartsWith("PF Props") || t.name.StartsWith("PF Plant")) return true;
-        }
-        return false;
-    }
-
-    // Celdas con suelo (hierba o piedra) que no son muro ni están ocupadas por props, más las escaleras.
-    // Sirve para que los enemigos rodeen obstáculos y para elegir dónde aparecen.
-    private List<Vector2> BuildRuinsFlowField()
-    {
-        var grounds = new List<Tilemap>();
-        var walls = new List<Tilemap>();
+        var levelLayers = new List<int>();
+        var grounds = new Dictionary<int, List<Tilemap>>();
+        var walls = new Dictionary<int, List<Tilemap>>();
         foreach (Tilemap tm in FindObjectsByType<Tilemap>())
         {
-            if (tm.name.Contains("Shadow")) continue;
-            if (tm.name.Contains("Wall")) walls.Add(tm);
-            else if (tm.name.Contains("Grass") || tm.name.Contains("Ground")) grounds.Add(tm);
+            if (tm.name.Contains("Shadow") || !tm.name.StartsWith("Layer ")) continue;
+            int layer = LayerMask.NameToLayer(tm.name.Split('-')[0].Trim());   // "Layer 2 - Grass" -> capa "Layer 2"
+            if (layer < 0) continue;
+            if (!levelLayers.Contains(layer)) levelLayers.Add(layer);
+            var dict = tm.name.Contains("Wall") ? walls : tm.name.Contains("Grass") || tm.name.Contains("Ground") ? grounds : null;
+            if (dict == null) continue;
+            if (!dict.TryGetValue(layer, out List<Tilemap> list)) dict[layer] = list = new List<Tilemap>();
+            list.Add(tm);
         }
-        if (grounds.Count == 0) return new List<Vector2>();
+        levelLayers.Sort();
+        if (levelLayers.Count == 0) return new List<NavPoint>();
 
-        Tilemap reference = grounds[0];
-        int enemyMask = 1 << Mathf.Max(0, LayerMask.NameToLayer("Enemy"));
-        var cells = new HashSet<Vector3Int>();
-        var spawn = new List<Vector2>();
-
-        foreach (Tilemap g in grounds)
-        {
-            g.CompressBounds();
-            foreach (Vector3Int cell in g.cellBounds.allPositionsWithin)
+        // Zona que cubren los suelos.
+        Rect area = Rect.zero;
+        bool first = true;
+        foreach (List<Tilemap> list in grounds.Values)
+            foreach (Tilemap tm in list)
             {
-                if (!g.HasTile(cell)) continue;
-                Vector3 world = g.GetCellCenterWorld(cell);
-                Vector3Int refCell = reference.WorldToCell(world);
-                if (cells.Contains(refCell)) continue;
+                tm.CompressBounds();
+                Vector3 min = tm.CellToWorld(tm.cellBounds.min);
+                Vector3 max = tm.CellToWorld(tm.cellBounds.max);
+                Rect r = Rect.MinMaxRect(min.x, min.y, max.x, max.y);
+                area = first ? r : Rect.MinMaxRect(Mathf.Min(area.xMin, r.xMin), Mathf.Min(area.yMin, r.yMin), Mathf.Max(area.xMax, r.xMax), Mathf.Max(area.yMax, r.yMax));
+                first = false;
+            }
 
-                bool isWall = false;
-                foreach (Tilemap w in walls)
-                    if (w.HasTile(w.WorldToCell(world))) { isWall = true; break; }
-                if (isWall || FlowField.IsBlocked(world, enemyMask)) continue;
+        // Escaleras: el cuerpo pertenece al nivel superior y la línea del trigger une los dos niveles.
+        var stairBodies = new List<(Bounds bounds, int upper)>();
+        var stairLinks = new List<FlowField.StairLink>();
+        foreach (StairsLayerTrigger t in FindObjectsByType<StairsLayerTrigger>())
+        {
+            int upper = LayerMask.NameToLayer(t.layerUpper);
+            int lower = LayerMask.NameToLayer(t.layerLower);
+            Collider2D line = t.GetComponent<Collider2D>();
+            if (upper < 0 || lower < 0 || line == null) continue;
 
-                cells.Add(refCell);
-                spawn.Add(world);
+            Transform body = t.transform.parent != null ? t.transform.parent : t.transform;
+            foreach (SpriteRenderer sr in body.GetComponentsInChildren<SpriteRenderer>())
+                stairBodies.Add((sr.bounds, upper));
+
+            // Lado "de abajo" de la línea según la orientación de la escalera.
+            Vector2 outward = t.direction == StairsLayerTrigger.Direction.South ? Vector2.down
+                            : t.direction == StairsLayerTrigger.Direction.North ? Vector2.up
+                            : t.direction == StairsLayerTrigger.Direction.West ? Vector2.left : Vector2.right;
+            Bounds b = line.bounds;
+            bool horizontal = b.size.x >= b.size.y;
+            float length = horizontal ? b.size.x : b.size.y;
+            for (float k = 0.25f; k < length; k += 0.25f)
+            {
+                Vector2 point = horizontal ? new Vector2(b.min.x + k, b.center.y) : new Vector2(b.center.x, b.min.y + k);
+                // Se conectan las celdas cercanas a ambos lados de la línea (no sólo una) para que no quede
+                // ninguna celda al pie de la escalera desde la que el camino "rebote".
+                foreach (float lowOffset in new[] { 0.15f, 0.6f })
+                foreach (float upOffset in new[] { 0.15f, 0.6f })
+                    stairLinks.Add(new FlowField.StairLink
+                    {
+                        lowerPoint = point + outward * lowOffset,
+                        upperPoint = point - outward * upOffset,
+                        lowerLayer = lower,
+                        upperLayer = upper,
+                    });
             }
         }
 
-        // Las escaleras unen los niveles: también son transitables (pero no se aparece en ellas).
-        foreach (Transform t in FindObjectsByType<Transform>())
+        int[] layers = levelLayers.ToArray();
+
+        bool InStairs(int layer, Vector2 p)
         {
-            if (!t.name.Contains("Stairs") || t.GetComponent<StairsLayerTrigger>() != null) continue;
-            foreach (SpriteRenderer sr in t.GetComponentsInChildren<SpriteRenderer>())
-            {
-                Bounds b = sr.bounds;
-                for (float x = b.min.x + 0.5f; x < b.max.x; x += 1f)
-                for (float y = b.min.y + 0.5f; y < b.max.y; y += 1f)
-                    cells.Add(reference.WorldToCell(new Vector3(x, y, 0f)));
-            }
+            foreach (var s in stairBodies)
+                if (s.upper == layer && s.bounds.Contains(new Vector3(p.x, p.y, s.bounds.center.z))) return true;
+            return false;
         }
 
-        gameObject.AddComponent<FlowField>().Build(reference, cells);
-        return spawn;
+        bool HasTile(Dictionary<int, List<Tilemap>> dict, int layer, Vector2 p)
+        {
+            if (!dict.TryGetValue(layer, out List<Tilemap> list)) return false;
+            foreach (Tilemap tm in list)
+                if (tm.HasTile(tm.WorldToCell(p))) return true;
+            return false;
+        }
+
+        bool IsGround(int level, Vector2 p)
+        {
+            int layer = layers[level];
+            if (InStairs(layer, p)) return true;
+            return HasTile(grounds, layer, p) && !HasTile(walls, layer, p);
+        }
+
+        bool CanSpawn(int level, Vector2 p)
+        {
+            int layer = layers[level];
+            if (InStairs(layer, p)) return false;
+            foreach (var s in stairBodies)
+                if (s.bounds.Contains(new Vector3(p.x, p.y, s.bounds.center.z))) return false;
+            return true;
+        }
+
+        var field = gameObject.AddComponent<FlowField>();
+        field.Build(area, layers, IsGround, CanSpawn, stairLinks);
+        return field.SpawnPoints;
     }
 
-    // Mapa 2: los enemigos chocan con los muros y se orientan con un flow field.
-    // La puerta de salida lleva de vuelta a las Ruinas pagando monedas.
-    private List<Vector2> SetupCastle()
+    // Mapa 2: un solo nivel. La puerta de salida lleva de vuelta a las Ruinas pagando monedas.
+    private List<NavPoint> SetupCastle()
     {
         foreach (SceneDoor d in FindObjectsByType<SceneDoor>())
         {
@@ -316,16 +290,24 @@ public class GameManager : MonoBehaviour
         }
 
         CastleMap map = FindAnyObjectByType<CastleMap>();
-        if (map == null) return new List<Vector2>();
+        if (map == null) return new List<NavPoint>();
+
+        map.floor.CompressBounds();
+        Vector3 min = map.floor.CellToWorld(map.floor.cellBounds.min);
+        Vector3 max = map.floor.CellToWorld(map.floor.cellBounds.max);
+        Rect area = Rect.MinMaxRect(min.x, min.y, max.x, max.y);
+
+        int layer = PlayerController.Instance != null ? PlayerController.Instance.gameObject.layer : LayerMask.NameToLayer("Layer 1");
+        bool IsGround(int level, Vector2 p)
+        {
+            Vector3Int c = map.floor.WorldToCell(p);
+            return map.floor.HasTile(c) && (map.walls == null || !map.walls.HasTile(map.walls.WorldToCell(p)));
+        }
+        bool CanSpawn(int level, Vector2 p) => p.y > -4f || Mathf.Abs(p.x) > 4f;   // no aparecer justo en la entrada
 
         var field = gameObject.AddComponent<FlowField>();
-        field.Build(map.floor, map.walls, 1 << 0);
-
-        // No aparecer justo en la entrada.
-        var points = new List<Vector2>();
-        foreach (Vector2 p in field.WalkableCenters)
-            if (p.y > -4f || Mathf.Abs(p.x) > 4f) points.Add(p);
-        return points;
+        field.Build(area, new[] { layer }, IsGround, CanSpawn, null);
+        return field.SpawnPoints;
     }
 
     // ---------- Bucle ----------
