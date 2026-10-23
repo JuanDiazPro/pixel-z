@@ -10,11 +10,13 @@ public class GameMenus : MonoBehaviour
 
     public bool PauseOpen => pauseRoot.activeSelf;
     public bool ShopOpen => shopRoot.activeSelf;
+    public bool CasinoOpen => casino != null && casino.IsOpen;
     public bool AnyOpen => PauseOpen || ShopOpen || gameOverRoot.activeSelf;
 
     private PixelZDatabase db;
     private GameObject pauseRoot, shopRoot, gameOverRoot;
     private Text shopCoins;
+    private Casino casino;
     private readonly List<ShopItem> items = new List<ShopItem>();
     private Text gameOverStats, gameOverRecord;
 
@@ -124,7 +126,13 @@ public class GameMenus : MonoBehaviour
         Text hint = UIFactory.Text(panel.transform, "La tienda sólo abre entre rondas · [B] o [Esc] para cerrar", 22, new Color(1f, 1f, 1f, 0.6f));
         UIFactory.Place(hint.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 110f), new Vector2(1100f, 30f));
         Button close = UIFactory.Button(panel.transform, "CERRAR", 36, () => SetShop(false), new Vector2(360f, 76f));
-        UIFactory.Place((RectTransform)close.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 24f), new Vector2(360f, 76f));
+        UIFactory.Place((RectTransform)close.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(-200f, 24f), new Vector2(360f, 76f));
+        Button casinoButton = UIFactory.Button(panel.transform, "CASINO", 36, OpenCasino, new Vector2(360f, 76f));
+        UIFactory.Place((RectTransform)casinoButton.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(200f, 24f), new Vector2(360f, 76f));
+        casinoButton.GetComponentInChildren<Text>().color = UIFactory.Gold;
+
+        casino = Casino.Create(root);
+        casino.onClosed = RefreshShop;
 
         shopRoot.SetActive(false);
     }
@@ -261,9 +269,23 @@ public class GameMenus : MonoBehaviour
 
     public void SetShop(bool open)
     {
+        casino.Close();
         shopRoot.SetActive(open);
         if (open) RefreshShop();
         ApplyTimeScale();
+    }
+
+    // ---------- Casino ----------
+
+    private void OpenCasino()
+    {
+        casino.Open();
+    }
+
+    // Esc dentro del casino: vuelve atrás un nivel (del juego a la sala, de la sala a la tienda).
+    public void CasinoBack()
+    {
+        casino.Back();
     }
 
     // ---------- Game Over ----------

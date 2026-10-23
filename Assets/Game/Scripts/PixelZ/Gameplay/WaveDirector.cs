@@ -92,6 +92,7 @@ public class WaveDirector : MonoBehaviour
         GameSession.Wave++;
         CurrentPhase = Phase.Fighting;
         spawnTimer = 1f;
+        Sfx.StartHordeMusic();
 
         // Llegada al castillo: sólo el jefe.
         if (introBossPending)
@@ -123,6 +124,7 @@ public class WaveDirector : MonoBehaviour
         CurrentPhase = Phase.Break;
         BreakRemaining = BreakTime;
         Boss = null;
+        Sfx.StopHordeMusic();
 
         if (BossOnlyRound)
         {

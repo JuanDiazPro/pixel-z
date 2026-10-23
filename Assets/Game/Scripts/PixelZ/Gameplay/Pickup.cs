@@ -138,12 +138,14 @@ public class Pickup : MonoBehaviour
             case PickupType.Coin:
                 GameSession.AddCoins(value);
                 GameHUD.Popup(player.Center + Vector2.up * 0.7f, "+" + value, new Color(1f, 0.85f, 0.25f));
+                Sfx.Play(Sfx.Clip.Coin, 0.7f);
                 break;
             case PickupType.Gem:
                 // Una gema es una moneda que vale más (GemValue): va al mismo saldo que se gasta en la tienda.
                 GameSession.AddCoins(value);
                 GameHUD.Popup(player.Center + Vector2.up * 0.7f, "+" + value, new Color(1f, 0.85f, 0.25f));
                 FX.Burst(transform.position, new Color(0.5f, 1f, 1f), 8, 2.5f, 0.06f, layer);
+                Sfx.Play(Sfx.Clip.Coin);
                 break;
             case PickupType.Heart:
                 if (GameSession.Hearts < GameSession.MaxHearts) player.Heal(1);
@@ -155,6 +157,7 @@ public class Pickup : MonoBehaviour
                 break;
             case PickupType.Potion:
                 player.ApplySpeedBuff(PotionDuration);
+                Sfx.Play(Sfx.Clip.Potion);
                 GameHUD.Toast("¡Poción de velocidad! (" + PotionDuration + " s)", new Color(1f, 0.5f, 0.45f));
                 break;
             case PickupType.Key:

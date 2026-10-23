@@ -44,13 +44,21 @@ public class MainMenu : MonoBehaviour
 
         if (titleScreen.activeSelf)
         {
-            if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame) ShowSelect(true);
+            if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)
+            {
+                Sfx.Play(Sfx.Clip.MenuSelect);
+                ShowSelect(true);
+            }
             return;
         }
 
+        bool left = kb.aKey.wasPressedThisFrame || kb.leftArrowKey.wasPressedThisFrame;
+        bool right = kb.dKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame;
+        if (left || right || kb.escapeKey.wasPressedThisFrame || kb.enterKey.wasPressedThisFrame) Sfx.Play(Sfx.Clip.MenuSelect);
+
         if (kb.escapeKey.wasPressedThisFrame) ShowSelect(false);
-        if (kb.aKey.wasPressedThisFrame || kb.leftArrowKey.wasPressedThisFrame) Select((selected + cards.Count - 1) % cards.Count);
-        if (kb.dKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame) Select((selected + 1) % cards.Count);
+        if (left) Select((selected + cards.Count - 1) % cards.Count);
+        if (right) Select((selected + 1) % cards.Count);
         if (kb.enterKey.wasPressedThisFrame) Play();
     }
 
@@ -130,7 +138,11 @@ public class MainMenu : MonoBehaviour
         card.frame.rectTransform.sizeDelta = new Vector2(400f, 660f);
         var button = card.frame.gameObject.AddComponent<Button>();
         button.transition = Selectable.Transition.None;
-        button.onClick.AddListener(() => Select(index));
+        button.onClick.AddListener(() =>
+        {
+            Sfx.Play(Sfx.Clip.MenuSelect);
+            Select(index);
+        });
         card.fx = card.frame.gameObject.AddComponent<UIButtonFx>();
         card.fx.normal = new Color(0.1f, 0.08f, 0.1f, 0.95f);
         card.fx.hover = new Color(0.28f, 0.18f, 0.1f, 0.98f);

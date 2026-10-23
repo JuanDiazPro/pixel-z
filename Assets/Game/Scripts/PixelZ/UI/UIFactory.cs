@@ -136,7 +136,11 @@ public static class UIFactory
         img.rectTransform.sizeDelta = size;
         var button = img.gameObject.AddComponent<Button>();
         button.transition = Selectable.Transition.None;
-        button.onClick.AddListener(() => onClick?.Invoke());
+        button.onClick.AddListener(() =>
+        {
+            Sfx.Play(Sfx.Clip.MenuSelect);
+            onClick?.Invoke();
+        });
 
         Text t = Text(img.transform, label, fontSize, Cream);
         Stretch(t.rectTransform);

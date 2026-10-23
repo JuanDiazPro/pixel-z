@@ -327,7 +327,8 @@ public class GameManager : MonoBehaviour
 
         if (kb.escapeKey.wasPressedThisFrame || kb.pKey.wasPressedThisFrame)
         {
-            if (menus.ShopOpen) menus.SetShop(false);
+            if (menus.CasinoOpen) menus.CasinoBack();
+            else if (menus.ShopOpen) menus.SetShop(false);
             else menus.SetPause(!menus.PauseOpen);
         }
         else if (kb.bKey.wasPressedThisFrame || kb.tabKey.wasPressedThisFrame)
@@ -398,6 +399,7 @@ public class GameManager : MonoBehaviour
     {
         if (IsOver) return;
         IsOver = true;
+        Sfx.StopHordeMusic();
         StartCoroutine(GameOverRoutine());
     }
 

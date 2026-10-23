@@ -351,6 +351,7 @@ public class PlayerController : MonoBehaviour
         dashDir = input != Vector2.zero ? input : aim;
         dashTime = 0.16f;
         dashCd = DashCooldown;
+        Sfx.Play(Sfx.Clip.Dodge, 0.8f);
         FX.Burst(transform.position + Vector3.up * 0.2f, new Color(1f, 1f, 1f, 0.6f), 8, 2.5f, 0.07f, SortingLayer);
     }
 
@@ -369,6 +370,7 @@ public class PlayerController : MonoBehaviour
 
         FX.Shake(0.25f, 0.25f);
         FX.Burst(Center, new Color(1f, 0.2f, 0.2f), 10, 3.5f, 0.08f, SortingLayer);
+        Sfx.Play(Sfx.Clip.LoseLife);
         GameHUD.Popup(Center + Vector2.up * 0.6f, "-" + damage + " ♥", new Color(1f, 0.3f, 0.3f));
         GameHUD.FlashDamage();
 
