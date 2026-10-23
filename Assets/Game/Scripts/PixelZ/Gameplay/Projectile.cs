@@ -127,11 +127,12 @@ public class Projectile : MonoBehaviour
         }
         else
         {
-            PlayerController player = PlayerController.Instance;
-            if (player != null && !player.Dead && Vector2.Distance(player.Center, pos) < radius + 0.3f)
+            foreach (PlayerController player in PlayerController.All)
             {
+                if (player.Dead || Vector2.Distance(player.Center, pos) >= radius + 0.3f) continue;
                 player.TakeHit((int)damage, pos - dir);
                 Kill(true);
+                return;
             }
         }
     }

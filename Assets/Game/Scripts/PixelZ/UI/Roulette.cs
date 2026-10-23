@@ -52,6 +52,9 @@ public class Roulette : MonoBehaviour
     private bool hasBall;
     private bool spinning;
     private float spinT, relStart, relTarget;
+    private int lastFret;
+    private float lastBounce;
+    private bool landed;
     private int pendingResult, pendingWin, pendingStake;
 
     public void Build(RectTransform screen)
@@ -372,6 +375,9 @@ public class Roulette : MonoBehaviour
         hasBall = true;
         spinT = 0f;
         spinning = true;
+        landed = false;
+        lastBounce = 0f;
+        lastFret = Mathf.FloorToInt(relStart / WheelRenderer.Seg);
         foreach (Image img in cellHighlights.Values) img.color = new Color(1f, 0.9f, 0.4f, 0f);
         resultText.text = "No va más...";
         resultText.color = UIFactory.Cream;
@@ -387,12 +393,15 @@ public class Roulette : MonoBehaviour
             wheelDeg += (IdleWheelSpeed + 120f * (1f - k) * (1f - k)) * dt;
             float e = 1f - Mathf.Pow(1f - k, 3f);
             ballRel = Mathf.Lerp(relStart, relTarget, e);
+            float ballSpeed = 3f * Mathf.Pow(1f - k, 2f);   // velocidad relativa (1 = muy rápida)
 
             // Gira por la pista exterior, cae hacia las casillas rebotando y se asienta.
             if (k < 0.42f)
             {
                 ballR = Mathf.Lerp(0.935f, 0.92f, k / 0.42f);
                 ballHop = 0f;
+                // Rueda por la pista: zumbido continuo que se apaga al ir frenando.
+                Sfx.RollingLoop(Mathf.Clamp01(ballSpeed) * 0.55f, 0.75f + 0.4f * Mathf.Clamp01(ballSpeed));
             }
             else if (k < 0.8f)
             {
@@ -400,11 +409,28 @@ public class Roulette : MonoBehaviour
                 float bounce = Mathf.Abs(Mathf.Sin(s * Mathf.PI * 4.5f)) * Mathf.Pow(1f - s, 1.5f);
                 ballR = Mathf.Lerp(0.92f, PocketRadius, Mathf.SmoothStep(0f, 1f, s)) + 0.05f * bounce;
                 ballHop = 7f * bounce;
+                Sfx.RollingLoop(Mathf.Clamp01(1f - s * 2.5f) * 0.4f, 0.8f);
+
+                // Al caer va chocando con los separadores (tic) y rebota.
+                int fret = Mathf.FloorToInt(ballRel / WheelRenderer.Seg);
+                if (fret != lastFret)
+                {
+                    lastFret = fret;
+                    Sfx.Play(Sfx.Clip.RouletteTick, 0.35f + 0.5f * (1f - s));
+                }
+                if (bounce < 0.05f && lastBounce >= 0.05f) Sfx.Play(Sfx.Clip.RouletteTick, 0.9f * (1f - s) + 0.2f);
+                lastBounce = bounce;
             }
             else
             {
                 ballR = PocketRadius;
                 ballHop = 0f;
+                if (!landed)
+                {
+                    landed = true;
+                    Sfx.RollingLoop(0f, 1f);
+                    Sfx.Play(Sfx.Clip.RouletteDrop, 0.9f);
+                }
             }
             if (k >= 1f) FinishSpin();
         }
@@ -420,6 +446,7 @@ public class Roulette : MonoBehaviour
     private void FinishSpin()
     {
         spinning = false;
+        Sfx.RollingLoop(0f, 1f);
         Casino.HeldCoins = null;
         int n = pendingResult;
         ballRel = relTarget;

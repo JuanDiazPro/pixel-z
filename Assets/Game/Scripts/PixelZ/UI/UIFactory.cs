@@ -157,7 +157,7 @@ public static class UIFactory
 }
 
 // Efecto hover/click para los botones (cambia color y escala, funciona con el juego en pausa).
-public class UIButtonFx : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
+public class UIButtonFx : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, ISelectHandler, IDeselectHandler
 {
     public Color normal = UIFactory.ButtonColor;
     public Color hover = UIFactory.ButtonHover;
@@ -165,7 +165,7 @@ public class UIButtonFx : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     private Image image;
     private Text label;
-    private bool over, down;
+    private bool over, down, focused;   // focused: seleccionado con el mando o el teclado
 
     public void Init(Image img, Text text)
     {
@@ -182,19 +182,21 @@ public class UIButtonFx : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public void OnPointerExit(PointerEventData e) { over = false; down = false; }
     public void OnPointerDown(PointerEventData e) => down = true;
     public void OnPointerUp(PointerEventData e) => down = false;
+    public void OnSelect(BaseEventData e) => focused = true;
+    public void OnDeselect(BaseEventData e) => focused = false;
 
     private void OnDisable()
     {
-        over = down = false;
+        over = down = focused = false;
         transform.localScale = Vector3.one;
     }
 
     private void Update()
     {
-        bool hot = over || selected;
+        bool hot = over || selected || focused;
         image.color = hot ? hover : normal;
         if (label != null) label.color = hot ? UIFactory.Gold : UIFactory.Cream;
-        float target = down ? 0.96f : over ? 1.06f : 1f;
+        float target = down ? 0.96f : over || focused ? 1.06f : 1f;
         transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * target, 1f - Mathf.Exp(-20f * Time.unscaledDeltaTime));
     }
 }

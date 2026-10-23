@@ -19,7 +19,7 @@ public class ChestShop : MonoBehaviour
 
     private void Update()
     {
-        PlayerController player = PlayerController.Instance;
+        PlayerController player = PlayerController.Nearest(transform.position);
         if (player == null || player.Dead || Time.timeScale == 0f) return;
 
         if (!GameSession.ChestOpened)
@@ -40,12 +40,11 @@ public class ChestShop : MonoBehaviour
         }
 
         bool canAfford = GameSession.Coins >= price;
-        string text = "COFRE DEL GUARDIÁN\nContiene la llave del castillo\n[E] Comprar por " + price + " monedas";
+        string text = "COFRE DEL GUARDIÁN\nContiene la llave del castillo\n" + GameInput.InteractLabel + " Comprar por " + price + " monedas";
         if (!canAfford) text += "\n(te faltan " + (price - GameSession.Coins) + ")";
         GameHUD.Prompt(promptPos, text, canAfford ? new Color(1f, 0.85f, 0.3f) : new Color(1f, 0.55f, 0.5f));
 
-        Keyboard kb = Keyboard.current;
-        if (kb != null && kb.eKey.wasPressedThisFrame) TryPurchase(player);
+        if (GameInput.AnyInteractPressed) TryPurchase(player);
     }
 
     public bool TryPurchase(PlayerController player)

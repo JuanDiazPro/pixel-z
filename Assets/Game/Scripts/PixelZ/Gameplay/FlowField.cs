@@ -46,6 +46,7 @@ public class FlowField : MonoBehaviour
     private readonly RaycastHit2D[] rayHits = new RaycastHit2D[8];
     private float timer;
     private int lastTarget = -1;
+    private readonly List<int> targets = new List<int>();
 
     private const int StepCost = 10, DiagCost = 14, Buckets = 32;   // Buckets > coste máximo de un paso
     private const int LookAhead = 10;
@@ -211,27 +212,39 @@ public class FlowField : MonoBehaviour
 
     private void Update()
     {
-        PlayerController player = PlayerController.Instance;
-        if (player == null || walk == null) return;
+        if (walk == null || PlayerController.All.Count == 0) return;
+
+        // Distancias desde todos los jugadores vivos a la vez: cada enemigo baja hacia el más cercano.
+        targets.Clear();
+        int key = 17;
+        foreach (PlayerController player in PlayerController.All)
+        {
+            if (player.Dead && PlayerController.AnyAlive) continue;
+            int t = NearestWalkable(LevelOf(player.gameObject.layer), player.transform.position);
+            if (t >= 0 && !targets.Contains(t)) targets.Add(t);
+            key = key * 31 + t;
+        }
 
         timer -= Time.deltaTime;
-        int target = NearestWalkable(LevelOf(player.gameObject.layer), player.transform.position);
-        if (timer > 0f && target == lastTarget) return;
+        if (timer > 0f && key == lastTarget) return;
         timer = 0.2f;
-        lastTarget = target;
-        Recompute(target);
+        lastTarget = key;
+        Recompute(targets);
     }
 
-    private void Recompute(int target)
+    private void Recompute(List<int> sources)
     {
         for (int i = 0; i < dist.Length; i++) dist[i] = int.MaxValue;
-        if (target < 0) return;
+        if (sources.Count == 0) return;
 
         // Dijkstra con cola de cubos (los costes son enteros pequeños): lineal en el número de celdas.
         foreach (List<int> b in buckets) b.Clear();
-        dist[target] = 0;
-        buckets[0].Add(target);
-        int pending = 1;
+        foreach (int s in sources)
+        {
+            dist[s] = 0;
+            buckets[0].Add(s);
+        }
+        int pending = sources.Count;
         for (int d = 0; pending > 0; d++)
         {
             List<int> bucket = buckets[d % Buckets];

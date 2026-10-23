@@ -88,6 +88,7 @@ public class GameMenus : MonoBehaviour
         if (gameOverRoot.activeSelf) return;
         if (paused && ShopOpen) SetShop(false);
         pauseRoot.SetActive(paused);
+        FocusFirstButton(paused ? pauseRoot : null);
         ApplyTimeScale();
     }
 
@@ -177,30 +178,36 @@ public class GameMenus : MonoBehaviour
         items.Add(new ShopItem
         {
             name = "Corazón extra", icon = db.heart, maxLevel = GameSession.HeartsCap - GameSession.StartHearts,
-            description = () => "+1 corazón máximo y te cura 1",
+            description = () => GameSession.TwoPlayers ? "+1 corazón máximo y cura 1 a cada uno" : "+1 corazón máximo y te cura 1",
             level = () => GameSession.ExtraHeartLevel, price = () => 60 + 40 * GameSession.ExtraHeartLevel,
             buy = () =>
             {
                 GameSession.ExtraHeartLevel++;
                 GameSession.MaxHearts++;
-                GameSession.Hearts = Mathf.Min(GameSession.Hearts + 1, GameSession.MaxHearts);
+                HealAll(1);
             },
         });
         items.Add(new ShopItem
         {
             name = "Manzana curativa", icon = db.apple, maxLevel = 0,
-            description = () => "Recupera 1 corazón",
+            description = () => GameSession.TwoPlayers ? "Recupera 1 corazón a cada jugador" : "Recupera 1 corazón",
             level = () => 0, price = () => 25,
-            available = () => GameSession.Hearts < GameSession.MaxHearts,
-            buy = () => GameSession.Hearts = Mathf.Min(GameSession.Hearts + 1, GameSession.MaxHearts),
+            available = () => PlayerController.All.Exists(p => !p.Dead && p.Hearts < GameSession.MaxHearts),
+            buy = () => HealAll(1),
         });
         items.Add(new ShopItem
         {
             name = "Poción rápida", icon = db.potion, maxLevel = 0,
             description = () => "Velocidad x1.6 durante 8 s",
             level = () => 0, price = () => 20,
-            buy = () => { if (PlayerController.Instance != null) PlayerController.Instance.ApplySpeedBuff(8f); },
+            buy = () => { foreach (PlayerController p in PlayerController.All) if (!p.Dead) p.ApplySpeedBuff(8f); },
         });
+    }
+
+    private static void HealAll(int amount)
+    {
+        foreach (PlayerController p in PlayerController.All)
+            if (!p.Dead) GameSession.SetHearts(p.Index, p.Hearts + amount);
     }
 
     private void BuildItemRow(Transform parent, ShopItem item)
@@ -272,7 +279,26 @@ public class GameMenus : MonoBehaviour
         casino.Close();
         shopRoot.SetActive(open);
         if (open) RefreshShop();
+        FocusFirstButton(open ? shopRoot : null);
         ApplyTimeScale();
+    }
+
+    // Con mando conectado, el primer botón queda seleccionado para poder navegar con la cruceta y A.
+    private static void FocusFirstButton(GameObject root)
+    {
+        var es = UnityEngine.EventSystems.EventSystem.current;
+        if (es == null) return;
+        if (root == null || GameInput.Pad == null)
+        {
+            es.SetSelectedGameObject(null);
+            return;
+        }
+        foreach (Button b in root.GetComponentsInChildren<Button>())
+            if (b.interactable)
+            {
+                es.SetSelectedGameObject(b.gameObject);
+                return;
+            }
     }
 
     // ---------- Casino ----------
@@ -335,7 +361,7 @@ public class GameMenus : MonoBehaviour
         string time = string.Format("{0:00}:{1:00}", (int)(t / 60f), (int)(t % 60f));
         string map = GameSession.MapReached >= 2 ? "Castillo" : "Ruinas";
         gameOverStats.text =
-            "Personaje:  <color=#ffd24d>" + GameSession.Class.name + "</color>\n" +
+            "Personaje:  <color=#ffd24d>" + GameSession.Class.name + (GameSession.TwoPlayers ? "</color> y <color=#59ccff>" + GameSession.Class2.name : "") + "</color>\n" +
             "Ronda alcanzada:  <color=#ffd24d>" + GameSession.Wave + "</color>   (" + map + ")\n" +
             "Monedas recogidas:  <color=#ffd24d>" + GameSession.CoinsCollected + "</color>\n" +
             "Enemigos eliminados:  <color=#ffd24d>" + GameSession.Kills + "</color>\n" +
@@ -343,6 +369,7 @@ public class GameMenus : MonoBehaviour
         gameOverRecord.text = record ? "¡NUEVO RÉCORD!" : "Récord: ronda " + GameSession.BestWave + "  ·  " + GameSession.BestCoins + " monedas";
 
         gameOverRoot.SetActive(true);
+        FocusFirstButton(gameOverRoot);
         GameHUD.SetVisible(false);
         ApplyTimeScale();
     }
@@ -357,7 +384,7 @@ public class GameMenus : MonoBehaviour
     private void Restart()
     {
         Time.timeScale = 1f;
-        GameSession.NewRun(GameSession.ClassIndex);
+        GameSession.NewRun(GameSession.ClassIndex, GameSession.TwoPlayers ? GameSession.ClassIndex2 : -1);
         LoadingScreen.Load("Game");
     }
 

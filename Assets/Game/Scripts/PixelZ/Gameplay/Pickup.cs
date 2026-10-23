@@ -112,7 +112,7 @@ public class Pickup : MonoBehaviour
         // Parpadeo antes de desaparecer.
         sr.enabled = life > 4f || Mathf.Repeat(life * 6f, 1f) > 0.35f;
 
-        PlayerController player = PlayerController.Instance;
+        PlayerController player = PlayerController.Nearest(transform.position);   // en cooperativo, el más cercano
         if (player == null || player.Dead || age < 0.35f) return;
 
         Vector2 target = player.Center;
@@ -148,7 +148,7 @@ public class Pickup : MonoBehaviour
                 Sfx.Play(Sfx.Clip.Coin);
                 break;
             case PickupType.Heart:
-                if (GameSession.Hearts < GameSession.MaxHearts) player.Heal(1);
+                if (player.Hearts < GameSession.MaxHearts) player.Heal(1);
                 else
                 {
                     GameSession.AddCoins(5);
@@ -198,7 +198,7 @@ public static class Loot
 
         // Corazones: raros, más probables cuando el jugador va mal. Con 1 corazón hay "seguro de pena".
         killsSinceHeart++;
-        int hearts = GameSession.Hearts;
+        int hearts = GameSession.LowestHearts;
         bool missing = hearts < GameSession.MaxHearts;
         bool heartOnGround = Pickup.All.Exists(p => p != null && p.Type == PickupType.Heart);
         float heartChance = !missing ? 0.005f : hearts == 1 ? 0.12f : 0.035f;

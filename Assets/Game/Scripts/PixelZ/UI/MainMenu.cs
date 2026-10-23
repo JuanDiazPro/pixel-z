@@ -11,12 +11,18 @@ public class MainMenu : MonoBehaviour
     private readonly List<Card> cards = new List<Card>();
     private int selected;
 
+    // Jugador 2 (mando): se une pulsando A en la selección y elige con la cruceta o el stick.
+    private bool p2Joined;
+    private int selected2;
+    private bool stickHeld;
+    private Text joinText;
+
     private class Card
     {
         public Image frame;
         public UIButtonFx fx;
         public SpriteAnimator preview;
-        public Text check;
+        public Text check, check2;
         public PlayerClassDef def;
     }
 
@@ -25,6 +31,7 @@ public class MainMenu : MonoBehaviour
         Time.timeScale = 1f;
         db = PixelZDatabase.I;
         selected = GameSession.SelectedClass;
+        selected2 = GameSession.SelectedClass2;
         UIFactory.EnsureEventSystem();
 
         Canvas canvas = UIFactory.CreateCanvas("Main Menu", 0);
@@ -40,17 +47,23 @@ public class MainMenu : MonoBehaviour
     private void Update()
     {
         Keyboard kb = Keyboard.current;
-        if (kb == null || LoadingScreen.IsLoading) return;
+        if (LoadingScreen.IsLoading) return;
+        Gamepad pad = GameInput.Pad;
 
         if (titleScreen.activeSelf)
         {
-            if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)
+            bool go = (kb != null && (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame))
+                   || (pad != null && (pad.buttonSouth.wasPressedThisFrame || pad.startButton.wasPressedThisFrame));
+            if (go)
             {
                 Sfx.Play(Sfx.Clip.MenuSelect);
                 ShowSelect(true);
             }
             return;
         }
+
+        UpdatePlayer2(pad);
+        if (kb == null) return;
 
         bool left = kb.aKey.wasPressedThisFrame || kb.leftArrowKey.wasPressedThisFrame;
         bool right = kb.dKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame;
@@ -60,6 +73,58 @@ public class MainMenu : MonoBehaviour
         if (left) Select((selected + cards.Count - 1) % cards.Count);
         if (right) Select((selected + 1) % cards.Count);
         if (kb.enterKey.wasPressedThisFrame) Play();
+    }
+
+    private void UpdatePlayer2(Gamepad pad)
+    {
+        if (pad == null)
+        {
+            if (p2Joined) { p2Joined = false; RefreshPlayer2(); }
+            joinText.text = "Conecta un mando para jugar a dobles (J2)";
+            return;
+        }
+
+        if (!p2Joined)
+        {
+            if (pad.buttonSouth.wasPressedThisFrame)
+            {
+                Sfx.Play(Sfx.Clip.MenuSelect);
+                p2Joined = true;
+                RefreshPlayer2();
+            }
+            else if (pad.startButton.wasPressedThisFrame) Play();
+            return;
+        }
+
+        float x = pad.leftStick.ReadValue().x + pad.dpad.ReadValue().x;
+        int dir = x > 0.5f ? 1 : x < -0.5f ? -1 : 0;
+        if (dir != 0 && !stickHeld)
+        {
+            Sfx.Play(Sfx.Clip.MenuSelect);
+            selected2 = (selected2 + dir + cards.Count) % cards.Count;
+            RefreshPlayer2();
+        }
+        stickHeld = dir != 0;
+
+        if (pad.buttonEast.wasPressedThisFrame)
+        {
+            Sfx.Play(Sfx.Clip.MenuSelect);
+            p2Joined = false;
+            RefreshPlayer2();
+        }
+        else if (pad.startButton.wasPressedThisFrame || pad.buttonSouth.wasPressedThisFrame) Play();
+    }
+
+    private void RefreshPlayer2()
+    {
+        for (int i = 0; i < cards.Count; i++)
+        {
+            cards[i].check2.gameObject.SetActive(p2Joined && i == selected2);
+            cards[i].check.text = p2Joined ? "J1" : "SELECCIONADO";
+        }
+        joinText.text = p2Joined
+            ? "<color=#59ccff>J2 unido</color> · cruceta: elegir soldado · A / Start: ¡a jugar! · B: salir"
+            : "J2: pulsa <color=#59ccff>A</color> en el mando para unirte (2 jugadores)";
     }
 
     // ---------- Portada ----------
@@ -102,6 +167,8 @@ public class MainMenu : MonoBehaviour
 
         Text title = UIFactory.Text(screen, "ELIGE TU SOLDADO", 72, UIFactory.Gold);
         UIFactory.Place(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -40f), new Vector2(1400f, 90f));
+        joinText = UIFactory.Text(screen, "", 26, UIFactory.Cream);
+        UIFactory.Place(joinText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -122f), new Vector2(1600f, 36f));
 
         var row = UIFactory.Rect("Cards", screen);
         UIFactory.Place(row, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 10f), new Vector2(1800f, 680f));
@@ -127,6 +194,7 @@ public class MainMenu : MonoBehaviour
         UIFactory.Button(buttons, "¡A JUGAR!", 50, Play, new Vector2(440f, 96f));
 
         Select(selected);
+        RefreshPlayer2();
     }
 
     private Card BuildCard(Transform parent, int index)
@@ -186,6 +254,9 @@ public class MainMenu : MonoBehaviour
 
         card.check = UIFactory.Text(t, "SELECCIONADO", 22, new Color(0.5f, 1f, 0.5f));
         UIFactory.Place(card.check.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -20f), new Vector2(360f, 30f));
+        card.check2 = UIFactory.Text(t, "J2", 26, PlayerController.PlayerColors[1]);
+        UIFactory.Place(card.check2.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -52f), new Vector2(360f, 32f));
+        card.check2.gameObject.SetActive(false);
         return card;
     }
 
@@ -234,7 +305,8 @@ public class MainMenu : MonoBehaviour
     {
         if (LoadingScreen.IsLoading) return;
         GameSession.SelectedClass = selected;
-        GameSession.NewRun(selected);
+        if (p2Joined) GameSession.SelectedClass2 = selected2;
+        GameSession.NewRun(selected, p2Joined ? selected2 : -1);
         LoadingScreen.Load("Game", 3f);
     }
 

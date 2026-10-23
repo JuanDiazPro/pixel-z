@@ -120,7 +120,7 @@ public class Breakable : MonoBehaviour
         }
         else if (r < 0.83f)
         {
-            if (GameSession.Hearts < GameSession.MaxHearts) Pickup.Spawn(PickupType.Heart, pos, 1, layer);
+            if (GameSession.LowestHearts < GameSession.MaxHearts) Pickup.Spawn(PickupType.Heart, pos, 1, layer);
             else for (int i = 0; i < 2; i++) Pickup.Spawn(PickupType.Coin, pos, 1, layer);
         }
         else
@@ -160,8 +160,8 @@ public class Breakable : MonoBehaviour
         if (respawnTimer > 0f) return;
 
         // No reaparece encima del jugador ni de enemigos.
-        PlayerController player = PlayerController.Instance;
-        if (player != null && Vector2.Distance(player.transform.position, transform.position) < 3f) return;
+        foreach (PlayerController player in PlayerController.All)
+            if (Vector2.Distance(player.transform.position, transform.position) < 3f) return;
         foreach (Enemy e in Enemy.All)
             if (Vector2.Distance(e.transform.position, transform.position) < 1f) return;
 

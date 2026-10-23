@@ -486,6 +486,7 @@ public class Blackjack : MonoBehaviour
     {
         Vector2 from = v.rt.anchoredPosition;
         float startRot = v.rt.localEulerAngles.z;
+        if (!instant) Sfx.Play(Sfx.Clip.CardDeal, 0.8f);
         float t = 0f;
         const float duration = 0.34f;
         while (t < 1f)
@@ -498,7 +499,11 @@ public class Blackjack : MonoBehaviour
             {
                 float flip = Mathf.Abs(Mathf.Cos(Mathf.Clamp01((t - 0.2f) / 0.6f) * Mathf.PI));
                 bool showFace = t >= 0.5f;
-                if (showFace != v.faceUp) SetFace(v, showFace);
+                if (showFace != v.faceUp)
+                {
+                    SetFace(v, showFace);
+                    if (!instant) Sfx.Play(Sfx.Clip.CardFlip, 0.5f);
+                }
                 v.rt.localScale = new Vector3(Mathf.Max(0.05f, flip), 1f, 1f);
             }
             yield return null;
@@ -514,7 +519,11 @@ public class Blackjack : MonoBehaviour
         while (t < 1f)
         {
             t = Mathf.Min(1f, t + Dt / 0.3f);
-            if (t >= 0.5f && !v.faceUp) SetFace(v, true);
+            if (t >= 0.5f && !v.faceUp)
+            {
+                SetFace(v, true);
+                if (!instant) Sfx.Play(Sfx.Clip.CardFlip, 0.8f);
+            }
             v.rt.localScale = new Vector3(Mathf.Max(0.05f, Mathf.Abs(Mathf.Cos(t * Mathf.PI))), 1f + 0.08f * Mathf.Sin(t * Mathf.PI), 1f);
             yield return null;
         }

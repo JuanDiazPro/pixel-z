@@ -125,6 +125,7 @@ public class WaveDirector : MonoBehaviour
         BreakRemaining = BreakTime;
         Boss = null;
         Sfx.StopHordeMusic();
+        GameManager.Instance.ReviveFallen();
 
         if (BossOnlyRound)
         {
@@ -210,13 +211,13 @@ public class WaveDirector : MonoBehaviour
         for (int attempt = 0; attempt < 40; attempt++)
         {
             NavPoint p = spawnPoints[Random.Range(0, spawnPoints.Count)];
-            float d = Vector2.Distance(p.position, playerPos);
+            float d = PlayerController.DistanceToNearest(p.position);   // lejos de todos los jugadores
             if (d >= minDist && d <= maxDist && Reachable(p)) return p;
         }
         for (int attempt = 0; attempt < 40; attempt++)
         {
             NavPoint p = spawnPoints[Random.Range(0, spawnPoints.Count)];
-            if (Vector2.Distance(p.position, playerPos) >= 4f && Reachable(p)) return p;
+            if (PlayerController.DistanceToNearest(p.position) >= 4f && Reachable(p)) return p;
         }
         return spawnPoints[Random.Range(0, spawnPoints.Count)];
     }

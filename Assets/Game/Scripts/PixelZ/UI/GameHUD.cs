@@ -12,7 +12,17 @@ public class GameHUD : MonoBehaviour
     private RectTransform root;
 
     private readonly List<Image> hearts = new List<Image>();
-    private RectTransform heartsRow;
+    private readonly List<Image> hearts2 = new List<Image>();
+    private RectTransform heartsRow, heartsRow2;
+    private Text koText2, koText1;
+
+    // Habilidad, dash y poción de cada jugador (el J2 los tiene abajo a la derecha).
+    private class SlotSet
+    {
+        public Image abilityIcon, abilityFill, dashFill, potionIcon, potionFill;
+        public Text abilityText, abilityKey;
+    }
+    private SlotSet slots2;
     private Text coinsText, waveText, waveInfo, timeText, killsText, comboText;
     private RectTransform coinIcon;
     private Image keyIcon;
@@ -76,25 +86,42 @@ public class GameHUD : MonoBehaviour
         UIFactory.Stretch(popupRoot);
 
         // --- Arriba a la izquierda: corazones y monedas ---
+        bool coop = GameSession.TwoPlayers;
+        float rowX = coop ? 64f : 14f, coinsY = coop ? -148f : -84f;
         Image topLeft = UIFactory.Panel(root, "Stats Panel", new Color(0.05f, 0.04f, 0.07f, 0.6f), false);
-        UIFactory.Place(topLeft.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -16f), new Vector2(420f, 150f));
+        UIFactory.Place(topLeft.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -16f), new Vector2(coop ? 470f : 420f, coop ? 214f : 150f));
         topLeft.raycastTarget = false;
 
         heartsRow = UIFactory.Rect("Hearts", topLeft.transform);
-        UIFactory.Place(heartsRow, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(14f, -12f), new Vector2(400f, 60f));
+        UIFactory.Place(heartsRow, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(rowX, -12f), new Vector2(400f, 60f));
+        if (coop)
+        {
+            // Una fila de corazones por jugador, con su color.
+            heartsRow2 = UIFactory.Rect("Hearts J2", topLeft.transform);
+            UIFactory.Place(heartsRow2, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(rowX, -76f), new Vector2(400f, 60f));
+            for (int i = 0; i < 2; i++)
+            {
+                Text tag = UIFactory.Text(topLeft.transform, "J" + (i + 1), 30, PlayerController.PlayerColors[i], TextAnchor.MiddleLeft);
+                UIFactory.Place(tag.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(12f, -14f - i * 64f), new Vector2(50f, 56f));
+                Text ko = UIFactory.Text(topLeft.transform, "KO · vuelve al acabar la ronda", 22, new Color(1f, 0.45f, 0.4f), TextAnchor.MiddleLeft);
+                UIFactory.Place(ko.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(rowX, -14f - i * 64f), new Vector2(400f, 56f));
+                ko.gameObject.SetActive(false);
+                if (i == 0) koText1 = ko; else koText2 = ko;
+            }
+        }
 
         coinIcon = UIFactory.Image(topLeft.transform, "Coin", db.coin, Color.white).rectTransform;
-        UIFactory.Place(coinIcon, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -84f), new Vector2(44f, 44f));
+        UIFactory.Place(coinIcon, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, coinsY), new Vector2(44f, 44f));
         coinsText = UIFactory.Text(topLeft.transform, "0", 34, UIFactory.Gold, TextAnchor.MiddleLeft);
-        UIFactory.Place(coinsText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(68f, -82f), new Vector2(130f, 48f));
+        UIFactory.Place(coinsText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(68f, coinsY + 2f), new Vector2(130f, 48f));
 
         // Las gemas no son otra moneda: suman GemValue monedas a este mismo contador.
         keyIcon = UIFactory.Image(topLeft.transform, "Key", db.key, Color.white);
-        UIFactory.Place(keyIcon.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(210f, -80f), new Vector2(52f, 52f));
+        UIFactory.Place(keyIcon.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(210f, coinsY + 4f), new Vector2(52f, 52f));
 
         // Objetivo actual (debajo del panel)
         objectiveText = UIFactory.Text(root, "", 22, UIFactory.Cream, TextAnchor.UpperLeft);
-        UIFactory.Place(objectiveText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(20f, -176f), new Vector2(640f, 60f));
+        UIFactory.Place(objectiveText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(20f, coop ? -240f : -176f), new Vector2(640f, 60f));
 
         objectiveArrow = UIFactory.Image(root, "Objective Arrow", db.arrow, UIFactory.Gold).rectTransform;
         objectiveArrow.sizeDelta = new Vector2(150f, 150f);
@@ -145,9 +172,30 @@ public class GameHUD : MonoBehaviour
         potionIcon.sprite = db.potion;
         potionFill.fillOrigin = (int)Image.Origin360.Top;
 
+        if (coop)
+        {
+            slots2 = new SlotSet();
+            slots2.abilityIcon = BuildSlot("Ability J2", new Vector2(-24f, 24f), out slots2.abilityFill, out slots2.abilityText, true);
+            UIFactory.Stretch(slots2.abilityIcon.rectTransform, 10f);
+            slots2.abilityKey = UIFactory.Text(slots2.abilityIcon.transform.parent, "B / RB", 18, PlayerController.PlayerColors[1]);
+            UIFactory.Place(slots2.abilityKey.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 0f), new Vector2(0f, 4f), new Vector2(200f, 26f));
+            Image dash2 = BuildSlot("Dash J2", new Vector2(-150f, 24f), out slots2.dashFill, out _, true);
+            dash2.sprite = db.DashIcon;
+            UIFactory.Stretch(dash2.rectTransform, 10f);
+            Text dashKey2 = UIFactory.Text(dash2.transform.parent, "A", 18, PlayerController.PlayerColors[1]);
+            UIFactory.Place(dashKey2.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 0f), new Vector2(0f, 4f), new Vector2(160f, 26f));
+            slots2.potionIcon = BuildSlot("Potion J2", new Vector2(-276f, 24f), out slots2.potionFill, out _, true);
+            slots2.potionIcon.sprite = db.potion;
+            slots2.potionFill.fillOrigin = (int)Image.Origin360.Top;
+        }
+
         // Controles
-        Text help = UIFactory.Text(root, "WASD mover · Click atacar · Espacio dash · Click der./Q habilidad · E interactuar · B tienda · Esc pausa", 18, new Color(1f, 1f, 1f, 0.55f), TextAnchor.LowerRight);
-        UIFactory.Place(help.rectTransform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-20f, 14f), new Vector2(1100f, 30f));
+        string helpText = coop
+            ? "J1: WASD · Click atacar · Espacio dash · Q habilidad     J2 (mando): stick · X/RT atacar · A dash · B habilidad     E/Y interactuar · B/Select tienda · Esc/Start pausa"
+            : "WASD mover · Click atacar · Espacio dash · Click der./Q habilidad · E interactuar · B tienda · Esc pausa";
+        Text help = UIFactory.Text(root, helpText, 18, new Color(1f, 1f, 1f, 0.55f), coop ? TextAnchor.LowerCenter : TextAnchor.LowerRight);
+        if (coop) UIFactory.Place(help.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 14f), new Vector2(1400f, 30f));
+        else UIFactory.Place(help.rectTransform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-20f, 14f), new Vector2(1100f, 30f));
 
         // Carteles
         var bannerRt = UIFactory.Rect("Banner", root);
@@ -169,10 +217,11 @@ public class GameHUD : MonoBehaviour
         prompt.gameObject.SetActive(false);
     }
 
-    private Image BuildSlot(string name, Vector2 pos, out Image fill, out Text label)
+    private Image BuildSlot(string name, Vector2 pos, out Image fill, out Text label, bool fromRight = false)
     {
         Image frame = UIFactory.Panel(root, name + " Slot", new Color(0.08f, 0.06f, 0.1f, 0.85f));
-        UIFactory.Place(frame.rectTransform, Vector2.zero, Vector2.zero, pos + new Vector2(0f, 30f), new Vector2(104f, 104f));
+        Vector2 corner = fromRight ? new Vector2(1f, 0f) : Vector2.zero;
+        UIFactory.Place(frame.rectTransform, corner, corner, pos + new Vector2(0f, 30f), new Vector2(104f, 104f));
         frame.raycastTarget = false;
 
         Image icon = UIFactory.Image(frame.transform, "Icon", null, Color.white);
@@ -269,22 +318,39 @@ public class GameHUD : MonoBehaviour
 
     private void UpdateHearts()
     {
-        while (hearts.Count < GameSession.MaxHearts)
+        UpdateHeartRow(hearts, heartsRow, GameSession.Hearts, PlayerAt(0), koText1);
+        if (heartsRow2 != null) UpdateHeartRow(hearts2, heartsRow2, GameSession.Hearts2, PlayerAt(1), koText2);
+    }
+
+    private static PlayerController PlayerAt(int index)
+    {
+        foreach (PlayerController p in PlayerController.All)
+            if (p.Index == index) return p;
+        return null;
+    }
+
+    private void UpdateHeartRow(List<Image> row, RectTransform parent, int current, PlayerController player, Text ko)
+    {
+        bool down = player != null && player.Dead && GameSession.TwoPlayers;
+        if (ko != null) ko.gameObject.SetActive(down);
+        parent.gameObject.SetActive(!down);
+
+        while (row.Count < GameSession.MaxHearts)
         {
-            Image h = UIFactory.Image(heartsRow, "Heart", db.heart, Color.white);
-            UIFactory.Place(h.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(hearts.Count * 62f, 0f), new Vector2(56f, 56f));
-            hearts.Add(h);
+            Image h = UIFactory.Image(parent, "Heart", db.heart, Color.white);
+            UIFactory.Place(h.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(row.Count * 62f, 0f), new Vector2(56f, 56f));
+            row.Add(h);
         }
 
-        bool danger = GameSession.Hearts == 1;
-        for (int i = 0; i < hearts.Count; i++)
+        bool danger = current == 1;
+        for (int i = 0; i < row.Count; i++)
         {
             bool visible = i < GameSession.MaxHearts;
-            hearts[i].gameObject.SetActive(visible);
-            bool full = i < GameSession.Hearts;
-            hearts[i].sprite = full ? db.heart : db.heartEmpty;
+            row[i].gameObject.SetActive(visible);
+            bool full = i < current;
+            row[i].sprite = full ? db.heart : db.heartEmpty;
             float s = full && danger ? 1f + 0.12f * Mathf.Abs(Mathf.Sin(Time.unscaledTime * 6f)) : 1f;
-            hearts[i].rectTransform.localScale = Vector3.one * s;
+            row[i].rectTransform.localScale = Vector3.one * s;
         }
     }
 
@@ -330,13 +396,13 @@ public class GameHUD : MonoBehaviour
 
     private void UpdateSlots()
     {
-        PlayerController p = PlayerController.Instance;
+        PlayerController p = PlayerAt(0) ?? PlayerController.Instance;
         if (p == null) return;
 
         abilityIcon.sprite = db.AbilityIcon(p.Def.ability);
         abilityFill.fillAmount = p.AbilityRemaining / Mathf.Max(p.AbilityCooldown, 0.01f);
         abilityText.text = p.AbilityRemaining > 0f ? Mathf.CeilToInt(p.AbilityRemaining).ToString() : "";
-        abilityKey.text = p.Def.abilityName;
+        abilityKey.text = GameSession.TwoPlayers ? "J1 · " + p.Def.abilityName : p.Def.abilityName;
 
         dashFill.fillAmount = p.DashRemaining / p.DashCooldown;
         dashText.text = "";
@@ -345,6 +411,18 @@ public class GameHUD : MonoBehaviour
         potionIcon.transform.parent.gameObject.SetActive(buff > 0f);
         potionIcon.sprite = p.SpeedBuffRemaining > 0f ? db.potion : db.mana;
         potionFill.fillAmount = 1f - buff / (p.SpeedBuffRemaining > 0f ? 8f : 5f);
+
+        PlayerController p2 = PlayerAt(1);
+        if (slots2 == null || p2 == null) return;
+        slots2.abilityIcon.sprite = db.AbilityIcon(p2.Def.ability);
+        slots2.abilityFill.fillAmount = p2.AbilityRemaining / Mathf.Max(p2.AbilityCooldown, 0.01f);
+        slots2.abilityText.text = p2.AbilityRemaining > 0f ? Mathf.CeilToInt(p2.AbilityRemaining).ToString() : "";
+        slots2.abilityKey.text = "J2 · " + p2.Def.abilityName + " (B)";
+        slots2.dashFill.fillAmount = p2.DashRemaining / p2.DashCooldown;
+        float buff2 = Mathf.Max(p2.SpeedBuffRemaining, p2.FuryRemaining);
+        slots2.potionIcon.transform.parent.gameObject.SetActive(buff2 > 0f);
+        slots2.potionIcon.sprite = p2.SpeedBuffRemaining > 0f ? db.potion : db.mana;
+        slots2.potionFill.fillAmount = 1f - buff2 / (p2.SpeedBuffRemaining > 0f ? 8f : 5f);
     }
 
     private void UpdateBoss()

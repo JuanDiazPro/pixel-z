@@ -4,7 +4,8 @@ using UnityEngine.SceneManagement;
 // Sonidos y música del juego. Los clips se cargan de Resources/Audio y se reproducen desde un objeto persistente.
 public class Sfx : MonoBehaviour
 {
-    public enum Clip { Potion, LoseLife, Coin, Dodge, MenuSelect, PlayerHit, EnemySword, EnemyDeath, Breakable, GameOver }
+    public enum Clip { Potion, LoseLife, Coin, Dodge, MenuSelect, PlayerHit, EnemySword, EnemyDeath, Breakable, GameOver,
+                       RouletteTick, RouletteDrop, CardDeal, CardFlip }
 
     // Nombre del archivo en Resources/Audio, separación mínima entre repeticiones y variación de tono.
     // Con muchos enemigos a la vez el límite evita que los golpes y muertes se amontonen en un ruido.
@@ -20,6 +21,10 @@ public class Sfx : MonoBehaviour
         ("enemigo_muere", 0.07f, 0.1f),
         ("golpe_caja", 0.05f, 0.08f),
         ("game_over", 0f, 0f),
+        ("ruleta_tic", 0.035f, 0.12f),
+        ("ruleta_cae", 0f, 0.05f),
+        ("carta", 0.05f, 0.1f),
+        ("carta_voltear", 0.03f, 0.1f),
     };
 
     private const float MusicVolume = 0.45f;
@@ -30,6 +35,7 @@ public class Sfx : MonoBehaviour
     private AudioSource sfxSource;
     private AudioSource variedSource;   // aparte para poder variar el tono sin afectar a los demás sonidos
     private AudioSource musicSource;
+    private AudioSource loopSource;     // sonido continuo (la bola rodando por la ruleta)
     private AudioClip[] clips;
     private AudioClip hordeMusic;
     private float musicTarget;
@@ -60,6 +66,11 @@ public class Sfx : MonoBehaviour
         musicSource.playOnAwake = false;
         musicSource.loop = true;
         musicSource.volume = 0f;
+
+        loopSource = gameObject.AddComponent<AudioSource>();
+        loopSource.playOnAwake = false;
+        loopSource.loop = true;
+        loopSource.clip = Resources.Load<AudioClip>("Audio/ruleta_bola");
 
         clips = new AudioClip[Defs.Length];
         lastPlayed = new float[Defs.Length];
@@ -123,6 +134,21 @@ public class Sfx : MonoBehaviour
             return;
         }
         s.sfxSource.PlayOneShot(c, volume);
+    }
+
+    // Bucle de la bola de la ruleta: volumen y tono siguen a su velocidad. Volumen 0 lo detiene.
+    public static void RollingLoop(float volume, float pitch)
+    {
+        Sfx s = I;
+        if (s.loopSource.clip == null) return;
+        if (volume <= 0.001f)
+        {
+            if (s.loopSource.isPlaying) s.loopSource.Stop();
+            return;
+        }
+        s.loopSource.volume = volume;
+        s.loopSource.pitch = pitch;
+        if (!s.loopSource.isPlaying) s.loopSource.Play();
     }
 
     public static void StartHordeMusic()

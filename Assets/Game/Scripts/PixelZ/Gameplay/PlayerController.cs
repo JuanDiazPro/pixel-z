@@ -2,14 +2,59 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 
-// Soldado jugable (Tiny RPG 01).
+// Soldado jugable (Tiny RPG 01). Puede haber dos (J1 teclado y ratón, J2 mando; ver GameInput).
 // WASD mover · Click izq. (mantener) atacar hacia el ratón · Espacio/Shift dash · Click der./Q habilidad.
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
-    public static PlayerController Instance { get; private set; }
+    public static readonly System.Collections.Generic.List<PlayerController> All = new System.Collections.Generic.List<PlayerController>();
+    public static readonly Color[] PlayerColors = { new Color(1f, 0.82f, 0.3f), new Color(0.35f, 0.8f, 1f) };
 
+    // Jugador "principal": el primero que siga vivo (o el J1 si no queda ninguno).
+    public static PlayerController Instance
+    {
+        get
+        {
+            foreach (PlayerController p in All)
+                if (!p.Dead) return p;
+            return All.Count > 0 ? All[0] : null;
+        }
+    }
+
+    public static bool AnyAlive
+    {
+        get
+        {
+            foreach (PlayerController p in All)
+                if (!p.Dead) return true;
+            return false;
+        }
+    }
+
+    public static PlayerController Nearest(Vector2 pos)
+    {
+        PlayerController best = null;
+        float bestD = float.MaxValue;
+        foreach (PlayerController p in All)
+        {
+            if (p.Dead) continue;
+            float d = ((Vector2)p.transform.position - pos).sqrMagnitude;
+            if (d < bestD) { bestD = d; best = p; }
+        }
+        return best;
+    }
+
+    public static float DistanceToNearest(Vector2 pos)
+    {
+        PlayerController p = Nearest(pos);
+        return p != null ? Vector2.Distance(p.transform.position, pos) : float.MaxValue;
+    }
+
+    public const float MaxSeparation = 13f;   // en cooperativo no se pueden alejar más que esto (los dos caben en pantalla)
+
+    public int Index { get; private set; }
     public PlayerClassDef Def { get; private set; }
+    public int Hearts => GameSession.GetHearts(Index);
     public bool Dead { get; private set; }
     public Vector2 Center => (Vector2)transform.position + Vector2.up * 0.45f;
     public string SortingLayer => group != null ? group.sortingLayerName : "Layer 1";
@@ -54,10 +99,12 @@ public class PlayerController : MonoBehaviour
     private float speedBuff, furyTime, shieldTime;
     private Transform shieldFx;
     private float afterImageTimer;
+    private Vector2 lastMousePos;
+    private bool padAiming;
 
-    public static PlayerController Create(Vector3 position, int physicsLayer, string sortingLayer, int sortingOrder, PlayerClassDef def)
+    public static PlayerController Create(Vector3 position, int physicsLayer, string sortingLayer, int sortingOrder, PlayerClassDef def, int index = 0)
     {
-        var go = new GameObject("Player - " + def.name);
+        var go = new GameObject("Player " + (index + 1) + " - " + def.name);
         go.tag = "Player";
         go.layer = physicsLayer;
         go.transform.position = position;
@@ -90,15 +137,30 @@ public class PlayerController : MonoBehaviour
         anim.target = sr;
 
         var pc = go.AddComponent<PlayerController>();
+        pc.Index = index;
         pc.Def = def;
         pc.body = sr;
         pc.anim = anim;
+
+        // En cooperativo, un aro de color bajo los pies distingue a cada jugador.
+        if (GameSession.TwoPlayers)
+        {
+            var ring = new GameObject("Player Marker");
+            ring.transform.SetParent(go.transform, false);
+            ring.transform.localPosition = new Vector3(0f, 0.08f, 0f);
+            ring.transform.localScale = new Vector3(0.75f, 0.32f, 1f);
+            var rsr = ring.AddComponent<SpriteRenderer>();
+            rsr.sprite = PixelZDatabase.I.ring;
+            Color pcol = PlayerColors[index];
+            rsr.color = new Color(pcol.r, pcol.g, pcol.b, 0.85f);
+            rsr.sortingOrder = -2;
+        }
         return pc;
     }
 
     private void Awake()
     {
-        Instance = this;
+        All.Add(this);
         rb = GetComponent<Rigidbody2D>();
         group = GetComponent<SortingGroup>();
         layerRenderer = GetComponent<SpriteRenderer>();
@@ -113,7 +175,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (Instance == this) Instance = null;
+        All.Remove(this);
     }
 
     private void Update()
@@ -138,6 +200,7 @@ public class PlayerController : MonoBehaviour
         Vector2 v;
         if (dashTime > 0f) v = dashDir * CurrentSpeed * 3.3f;
         else v = input * CurrentSpeed * (attacking ? 0.6f : 1f);
+        v = Leash(v);
 
         rb.linearVelocity = v + knock;
         knock = Vector2.MoveTowards(knock, Vector2.zero, 40f * Time.fixedDeltaTime);
@@ -156,10 +219,27 @@ public class PlayerController : MonoBehaviour
     private float AttackCooldown =>
         Def.attackCooldown * Mathf.Pow(0.92f, GameSession.AttackSpeedLevel) * (furyTime > 0f ? 0.5f : 1f);
 
+    // En cooperativo no deja que un jugador se aleje del otro más allá de MaxSeparation.
+    private Vector2 Leash(Vector2 v)
+    {
+        foreach (PlayerController other in All)
+        {
+            if (other == this || other.Dead) continue;
+            Vector2 away = (Vector2)(transform.position - other.transform.position);
+            if (away.magnitude < MaxSeparation) continue;
+            Vector2 n = away.normalized;
+            float outward = Vector2.Dot(v, n);
+            if (outward > 0f) v -= n * outward;
+        }
+        return v;
+    }
+
     private void ReadInput()
     {
-        Keyboard kb = Keyboard.current;
-        Mouse mouse = Mouse.current;
+        bool useKeys = GameInput.UsesKeyboard(Index), usePad = GameInput.UsesPad(Index);
+        Keyboard kb = useKeys ? Keyboard.current : null;
+        Mouse mouse = useKeys ? Mouse.current : null;
+        Gamepad pad = usePad ? GameInput.Pad : null;
 
         input = Vector2.zero;
         if (kb != null)
@@ -169,29 +249,76 @@ public class PlayerController : MonoBehaviour
             if (kb.sKey.isPressed || kb.downArrowKey.isPressed) input.y -= 1f;
             if (kb.wKey.isPressed || kb.upArrowKey.isPressed) input.y += 1f;
         }
+        if (pad != null)
+        {
+            Vector2 stick = pad.leftStick.ReadValue() + pad.dpad.ReadValue();
+            if (stick.magnitude > 0.2f) input += stick;
+        }
         if (input.sqrMagnitude > 1f) input.Normalize();
 
+        // Ratón: sólo apunta cuando se mueve o se usa, para que jugando solo también sirva el mando.
         Camera cam = Camera.main;
         if (mouse != null && cam != null)
         {
-            Vector3 mp = mouse.position.ReadValue();
-            mp.z = -cam.transform.position.z;
-            Vector2 world = cam.ScreenToWorldPoint(mp);
-            Vector2 d = world - Center;
-            if (d.sqrMagnitude > 0.01f) aim = d.normalized;
+            Vector2 mpos = mouse.position.ReadValue();
+            bool mouseActive = (mpos - lastMousePos).sqrMagnitude > 1f || mouse.leftButton.isPressed || mouse.rightButton.isPressed || pad == null;
+            lastMousePos = mpos;
+            if (mouseActive)
+            {
+                padAiming = false;
+                Vector3 mp = mpos;
+                mp.z = -cam.transform.position.z;
+                Vector2 world = cam.ScreenToWorldPoint(mp);
+                Vector2 d = world - Center;
+                if (d.sqrMagnitude > 0.01f) aim = d.normalized;
+            }
+        }
+        if (pad != null)
+        {
+            Vector2 rs = pad.rightStick.ReadValue();
+            if (rs.magnitude > 0.35f)
+            {
+                aim = rs.normalized;
+                padAiming = true;
+            }
+            else if ((padAiming || mouse == null) && input.sqrMagnitude > 0.04f) aim = input.normalized;
         }
 
-        bool dashPressed = kb != null && (kb.spaceKey.wasPressedThisFrame || kb.leftShiftKey.wasPressedThisFrame);
+        bool dashPressed = (kb != null && (kb.spaceKey.wasPressedThisFrame || kb.leftShiftKey.wasPressedThisFrame))
+                        || (pad != null && (pad.buttonSouth.wasPressedThisFrame || pad.leftTrigger.wasPressedThisFrame));
         if (dashPressed && dashCd <= 0f && dashTime <= 0f) StartDash();
 
-        bool abilityPressed = (mouse != null && mouse.rightButton.wasPressedThisFrame) || (kb != null && kb.qKey.wasPressedThisFrame);
+        bool abilityPressed = (mouse != null && mouse.rightButton.wasPressedThisFrame) || (kb != null && kb.qKey.wasPressedThisFrame)
+                           || (pad != null && (pad.buttonEast.wasPressedThisFrame || pad.rightShoulder.wasPressedThisFrame));
         if (abilityPressed && abilityTimer <= 0f) UseAbility();
 
-        bool attackHeld = mouse != null && mouse.leftButton.isPressed && !UIBlocksMouse();
-        if (attackHeld && !attacking && attackTimer <= 0f) StartAttack(false);
+        bool padAttack = pad != null && (pad.buttonWest.isPressed || pad.rightTrigger.isPressed);
+        bool attackHeld = (mouse != null && mouse.leftButton.isPressed && !UIBlocksMouse()) || padAttack;
+        if (attackHeld && !attacking && attackTimer <= 0f)
+        {
+            // Con mando y sin apuntar con el stick derecho, ayuda a apuntar al enemigo más cercano.
+            if (padAttack && pad.rightStick.ReadValue().magnitude <= 0.35f) AimAssist();
+            StartAttack(false);
+        }
 
         if (!attacking && input.x != 0f) facingLeft = input.x < 0f;
         body.flipX = facingLeft;
+    }
+
+    private void AimAssist()
+    {
+        Enemy best = null;
+        float bestScore = float.MaxValue;
+        foreach (Enemy e in Enemy.All)
+        {
+            if (!e.Alive) continue;
+            Vector2 d = e.HitCenter - Center;
+            float dist = d.magnitude;
+            if (dist > (Def.ranged ? 7f : 3.2f)) continue;
+            float score = dist - Vector2.Dot(d.normalized, aim) * 1.5f;   // prefiere lo que tiene delante
+            if (score < bestScore) { bestScore = score; best = e; }
+        }
+        if (best != null) aim = (best.HitCenter - Center).normalized;
     }
 
     private static bool UIBlocksMouse()
@@ -365,7 +492,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Dead || IsInvulnerable || GameManager.Instance == null || GameManager.Instance.IsOver) return false;
 
-        GameSession.Hearts = Mathf.Max(0, GameSession.Hearts - damage);
+        GameSession.SetHearts(Index, Hearts - damage);
         invuln = 1.3f;
         hurtTime = 0.25f;
         knock = ((Vector2)transform.position - sourcePos).normalized * 7f;
@@ -376,14 +503,14 @@ public class PlayerController : MonoBehaviour
         GameHUD.Popup(Center + Vector2.up * 0.6f, "-" + damage + " ♥", new Color(1f, 0.3f, 0.3f));
         GameHUD.FlashDamage();
 
-        if (GameSession.Hearts <= 0) Die();
+        if (Hearts <= 0) Die();
         else if (!attacking) anim.Play(art.hurt, 14f, false, true);
         return true;
     }
 
     public void Heal(int amount)
     {
-        GameSession.Hearts = Mathf.Min(GameSession.MaxHearts, GameSession.Hearts + amount);
+        GameSession.SetHearts(Index, Hearts + amount);
         FX.Glow(Center, new Color(1f, 0.3f, 0.4f, 0.7f), 0.5f, 2.5f, 0.5f, SortingLayer);
         GameHUD.Popup(Center + Vector2.up * 0.6f, "+" + amount + " ♥", new Color(1f, 0.45f, 0.55f));
     }
@@ -403,7 +530,24 @@ public class PlayerController : MonoBehaviour
         body.color = Def.tint;
         anim.Play(art.death, 7f, false, true);
         FX.Shake(0.4f, 0.4f);
-        GameManager.Instance.OnPlayerDied();
+        GameManager.Instance.OnPlayerDied(this);
+    }
+
+    // Cooperativo: el compañero caído vuelve al terminar la ronda, junto al que sigue en pie.
+    public void Revive(PlayerController partner, int hearts)
+    {
+        if (!Dead) return;
+        Dead = false;
+        transform.position = (Vector2)partner.transform.position + Random.insideUnitCircle.normalized * 0.8f;
+        gameObject.layer = partner.gameObject.layer;
+        if (layerRenderer != null && partner.layerRenderer != null) layerRenderer.sortingLayerID = partner.layerRenderer.sortingLayerID;
+        GameSession.SetHearts(Index, hearts);
+        invuln = 2.5f;
+        hurtTime = 0f;
+        anim.Play(art.idle, 8f, true);
+        FX.Ring(Center, PlayerColors[Index], 0.4f, 3f, 0.5f, SortingLayer);
+        FX.Glow(Center, new Color(1f, 1f, 0.8f, 0.8f), 0.5f, 3f, 0.6f, SortingLayer);
+        GameHUD.Popup(Center + Vector2.up * 0.7f, "¡J" + (Index + 1) + " VUELVE!", PlayerColors[Index]);
     }
 
     // ---------- Animación / efectos ----------

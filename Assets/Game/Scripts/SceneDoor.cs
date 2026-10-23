@@ -25,7 +25,8 @@ public class SceneDoor : MonoBehaviour
     public float bobSpeed = 4f;
     public float fadeSpeed = 8f;
 
-    private bool playerInside;
+    private int playersInside;   // en cooperativo pueden estar los dos dentro
+    private bool playerInside => playersInside > 0;
     private Vector3 iconBasePos;
     private float iconAlpha;
 
@@ -46,7 +47,7 @@ public class SceneDoor : MonoBehaviour
         UpdateIcon();
 
         if (!playerInside || SceneTransition.IsBusy || Time.timeScale == 0f) return;
-        if (PlayerController.Instance != null && PlayerController.Instance.Dead) return;
+        if (PlayerController.All.Count > 0 && !PlayerController.AnyAlive) return;
 
         if (GameManager.Instance != null)
         {
@@ -54,12 +55,11 @@ public class SceneDoor : MonoBehaviour
             if (Locked) GameHUD.Prompt(promptPos, "PUERTA SELLADA\nNecesitas la llave del cofre", new Color(1f, 0.55f, 0.5f));
             else if (price > 0 && GameSession.Coins < price)
                 GameHUD.Prompt(promptPos, label + " · " + price + " monedas\n(te faltan " + (price - GameSession.Coins) + ")", new Color(1f, 0.55f, 0.5f));
-            else if (price > 0) GameHUD.Prompt(promptPos, "[E] " + label + " · " + price + " monedas", new Color(1f, 0.85f, 0.3f));
-            else GameHUD.Prompt(promptPos, "[E] " + label, new Color(1f, 0.85f, 0.3f));
+            else if (price > 0) GameHUD.Prompt(promptPos, GameInput.InteractLabel + " " + label + " · " + price + " monedas", new Color(1f, 0.85f, 0.3f));
+            else GameHUD.Prompt(promptPos, GameInput.InteractLabel + " " + label, new Color(1f, 0.85f, 0.3f));
         }
 
-        Keyboard kb = Keyboard.current;
-        if (kb == null || !kb.eKey.wasPressedThisFrame) return;
+        if (!GameInput.AnyInteractPressed) return;
 
         if (Locked)
         {
@@ -101,11 +101,11 @@ public class SceneDoor : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player")) playerInside = true;
+        if (other.CompareTag("Player")) playersInside++;
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player")) playerInside = false;
+        if (other.CompareTag("Player")) playersInside = Mathf.Max(0, playersInside - 1);
     }
 }

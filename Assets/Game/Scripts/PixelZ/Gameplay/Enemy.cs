@@ -20,6 +20,7 @@ public class Enemy : MonoBehaviour
     private float hp, maxHp, speed, attackCooldown, animMult = 1f;
     private float attackTimer;
     private bool hitDone;
+    private PlayerController target;
     private float stun;
     private Vector2 knock;
     private float flash;
@@ -106,8 +107,8 @@ public class Enemy : MonoBehaviour
         All.Add(e);
 
         // Sin empujarse con el jugador: le persiguen y le pegan, pero no le bloquean el paso.
-        if (PlayerController.Instance != null)
-            foreach (Collider2D pc in PlayerController.Instance.GetComponents<Collider2D>())
+        foreach (PlayerController p in PlayerController.All)
+            foreach (Collider2D pc in p.GetComponents<Collider2D>())
                 Physics2D.IgnoreCollision(col, pc);
 
         FX.Ring(position + Vector2.up * 0.2f, def.boss ? new Color(1f, 0.2f, 0.3f, 0.9f) : new Color(0.6f, 0.2f, 0.8f, 0.8f),
@@ -157,13 +158,24 @@ public class Enemy : MonoBehaviour
         barRoot.gameObject.SetActive(Def.boss);
     }
 
+    // Persigue al jugador vivo más cercano; sólo cambia de presa si el otro está claramente más cerca,
+    // para no ir dando bandazos cuando los dos están a distancias parecidas.
+    private PlayerController PickTarget()
+    {
+        PlayerController nearest = PlayerController.Nearest(transform.position);
+        if (target == null || target.Dead || nearest == null) return nearest;
+        float dCur = Vector2.Distance(target.transform.position, transform.position);
+        float dNew = Vector2.Distance(nearest.transform.position, transform.position);
+        return dNew < dCur - 2f ? nearest : target;
+    }
+
     private void Update()
     {
         stateTime += Time.deltaTime;
         attackTimer -= Time.deltaTime;
         stun -= Time.deltaTime;
 
-        PlayerController player = PlayerController.Instance;
+        PlayerController player = target = PickTarget();
         // Sigue al sorting layer que ponen las escaleras al cambiar de nivel.
         if (rootRenderer != null && group.sortingLayerID != rootRenderer.sortingLayerID) group.sortingLayerID = rootRenderer.sortingLayerID;
 
@@ -213,7 +225,7 @@ public class Enemy : MonoBehaviour
 
         float dt = Time.fixedDeltaTime;
         Vector2 desired = Vector2.zero;
-        PlayerController player = PlayerController.Instance;
+        PlayerController player = target;
         bool chasing = false;
         if (state == State.Chase && stun <= 0f && player != null && !player.Dead)
         {
@@ -441,8 +453,9 @@ public class Enemy : MonoBehaviour
                     Vector2 facing = body.flipX ? Vector2.left : Vector2.right;
                     Vector2 hitPoint = (Vector2)transform.position + facing * 0.3f * Def.scale;
                     // Sólo golpea si está en el mismo nivel (no a través de un desnivel).
-                    if (gameObject.layer == player.gameObject.layer && Vector2.Distance(player.transform.position, hitPoint) <= Def.attackRange + 0.2f)
-                        player.TakeHit(Def.damage, transform.position);
+                    foreach (PlayerController p in PlayerController.All)
+                        if (!p.Dead && gameObject.layer == p.gameObject.layer && Vector2.Distance(p.transform.position, hitPoint) <= Def.attackRange + 0.2f)
+                            p.TakeHit(Def.damage, transform.position);
                     if (Def.boss) FX.Shake(0.12f, 0.15f);
                 }
             }

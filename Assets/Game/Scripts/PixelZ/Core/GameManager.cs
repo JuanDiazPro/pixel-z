@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour
         UIFactory.EnsureEventSystem();
         SetupPhysicsLayers();
 
-        PlayerController player = SpawnPlayer();
+        PlayerController player = SpawnPlayers();
         SetupCamera(player);
 
         List<NavPoint> spawnPoints = map == 1 ? SetupRuins() : SetupCastle();
@@ -76,6 +76,8 @@ public class GameManager : MonoBehaviour
         {
             GameHUD.Toast("Click izquierdo: atacar hacia el ratón  ·  Espacio: dash", UIFactory.Cream);
             GameHUD.Toast("Click derecho / Q: habilidad de " + GameSession.Class.name, UIFactory.Cream);
+            if (GameSession.TwoPlayers)
+                GameHUD.Toast("J2 (mando): stick mover · X/RT atacar · A dash · B/RB habilidad · Y interactuar", PlayerController.PlayerColors[1]);
         }
     }
 
@@ -94,6 +96,20 @@ public class GameManager : MonoBehaviour
     private void SetupPhysicsLayers()
     {
         ProjectileWallMask = MapIndex == 2 ? 1 << 0 : 0;
+    }
+
+    // Crea al J1 y, en cooperativo, al J2 a su lado. Devuelve el J1.
+    private PlayerController SpawnPlayers()
+    {
+        PlayerController p1 = SpawnPlayer();
+        if (GameSession.TwoPlayers)
+        {
+            Vector3 offset = Vector3.right * 0.9f;
+            PlayerController.Create(p1.transform.position + offset, p1.gameObject.layer, p1.SortingLayer, p1.SortingOrder, GameSession.Class2, 1);
+            if (GameSession.Hearts2 <= 0) GameSession.Hearts2 = Mathf.Max(1, GameSession.MaxHearts / 2);
+        }
+        if (GameSession.Hearts <= 0) GameSession.Hearts = Mathf.Max(1, GameSession.MaxHearts / 2);
+        return p1;
     }
 
     private PlayerController SpawnPlayer()
@@ -128,7 +144,11 @@ public class GameManager : MonoBehaviour
         var follow = cam.GetComponent<CameraFollow>();
         if (follow != null)
         {
-            follow.target = player.transform;
+            // La cámara sigue a un punto entre los jugadores vivos (en solitario, al propio jugador).
+            var target = new GameObject("Camera Target").AddComponent<CoopCameraTarget>();
+            target.transform.position = player.transform.position;
+            target.Init(cam);
+            follow.target = target.transform;
             follow.lerpSpeed = Mathf.Max(follow.lerpSpeed, 4f);
         }
         if (cam.GetComponent<CameraShake>() == null) cam.gameObject.AddComponent<CameraShake>();
@@ -325,18 +345,18 @@ public class GameManager : MonoBehaviour
         Keyboard kb = Keyboard.current;
         if (kb == null || LoadingScreen.IsLoading || SceneTransition.IsBusy || CoinInput.AnyFocused) return;
 
-        if (kb.escapeKey.wasPressedThisFrame || kb.pKey.wasPressedThisFrame)
+        if (GameInput.PausePressed)
         {
             if (menus.CasinoOpen) menus.CasinoBack();
             else if (menus.ShopOpen) menus.SetShop(false);
             else menus.SetPause(!menus.PauseOpen);
         }
-        else if (kb.bKey.wasPressedThisFrame || kb.tabKey.wasPressedThisFrame)
+        else if (GameInput.ShopPressed)
         {
             if (menus.ShopOpen) menus.SetShop(false);
             else if (!menus.PauseOpen) menus.TryOpenShop();
         }
-        else if ((kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame) && !menus.AnyOpen)
+        else if (GameInput.SkipPressed && !menus.AnyOpen)
         {
             WaveDirector.Instance?.SkipBreak();
         }
@@ -396,13 +416,29 @@ public class GameManager : MonoBehaviour
             GameHUD.Banner("¡" + enemy.Def.name.ToUpper() + " DERROTADO!", "Ha soltado un gran botín");
     }
 
-    public void OnPlayerDied()
+    public void OnPlayerDied(PlayerController who)
     {
         if (IsOver) return;
+        // En cooperativo la partida sigue mientras quede alguien en pie; el caído vuelve al acabar la ronda.
+        if (PlayerController.AnyAlive)
+        {
+            Sfx.Play(Sfx.Clip.LoseLife);
+            GameHUD.Banner("¡J" + (who.Index + 1) + " HA CAÍDO!", "Volverá al terminar la ronda · ¡Aguanta!");
+            return;
+        }
         IsOver = true;
         Sfx.StopHordeMusic();
         Sfx.Play(Sfx.Clip.GameOver);
         StartCoroutine(GameOverRoutine());
+    }
+
+    // Al superar una ronda, los compañeros caídos vuelven junto a quien siga vivo con la mitad de los corazones.
+    public void ReviveFallen()
+    {
+        PlayerController alive = PlayerController.Instance;
+        if (alive == null || alive.Dead) return;
+        foreach (PlayerController p in PlayerController.All)
+            if (p.Dead) p.Revive(alive, Mathf.Max(1, GameSession.MaxHearts / 2));
     }
 
     private IEnumerator GameOverRoutine()

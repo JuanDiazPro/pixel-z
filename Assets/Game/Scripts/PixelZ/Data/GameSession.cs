@@ -15,8 +15,17 @@ public static class GameSession
         set { PlayerPrefs.SetInt("pz_class", value); PlayerPrefs.Save(); }
     }
 
+    public static int SelectedClass2
+    {
+        get => Mathf.Clamp(PlayerPrefs.GetInt("pz_class2", 1), 0, PlayerClasses.All.Length - 1);
+        set { PlayerPrefs.SetInt("pz_class2", value); PlayerPrefs.Save(); }
+    }
+
     public static bool RunActive;
     public static int ClassIndex;
+    public static bool TwoPlayers;      // J1 teclado y ratón, J2 mando
+    public static int ClassIndex2;
+    public static int Hearts2;          // corazones del J2 (el máximo y las mejoras son compartidos)
     public static int Wave;             // última ronda iniciada (global, continúa entre mapas)
     public static int Coins;            // monedas disponibles para gastar
     public static int CoinsCollected;   // valor total recogido en la partida (gemas incluidas)
@@ -42,11 +51,37 @@ public static class GameSession
     public static int ExtraHeartLevel;
 
     public static PlayerClassDef Class => PlayerClasses.All[ClassIndex];
+    public static PlayerClassDef Class2 => PlayerClasses.All[ClassIndex2];
+    public static PlayerClassDef ClassOf(int player) => player == 0 ? Class : Class2;
 
-    public static void NewRun(int classIndex)
+    public static int GetHearts(int player) => player == 0 ? Hearts : Hearts2;
+
+    public static void SetHearts(int player, int value)
+    {
+        value = Mathf.Clamp(value, 0, MaxHearts);
+        if (player == 0) Hearts = value;
+        else Hearts2 = value;
+    }
+
+    // Corazones del jugador vivo que peor va (para el "seguro de pena" del botín).
+    public static int LowestHearts
+    {
+        get
+        {
+            int low = int.MaxValue;
+            foreach (PlayerController p in PlayerController.All)
+                if (!p.Dead) low = Mathf.Min(low, p.Hearts);
+            return low == int.MaxValue ? Hearts : low;
+        }
+    }
+
+    // class2 < 0: partida de un jugador.
+    public static void NewRun(int classIndex, int class2 = -1)
     {
         RunActive = true;
         ClassIndex = Mathf.Clamp(classIndex, 0, PlayerClasses.All.Length - 1);
+        TwoPlayers = class2 >= 0;
+        ClassIndex2 = Mathf.Clamp(class2, 0, PlayerClasses.All.Length - 1);
         Wave = 0;
         Coins = 0;
         CoinsCollected = 0;
@@ -54,6 +89,7 @@ public static class GameSession
         TimeAlive = 0f;
         MaxHearts = StartHearts;
         Hearts = StartHearts;
+        Hearts2 = StartHearts;
         HasKey = false;
         ChestOpened = false;
         MapReached = 1;
