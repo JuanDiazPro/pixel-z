@@ -323,7 +323,7 @@ public class GameManager : MonoBehaviour
         if (comboTimer <= 0f) Combo = 0;
 
         Keyboard kb = Keyboard.current;
-        if (kb == null || LoadingScreen.IsLoading || SceneTransition.IsBusy) return;
+        if (kb == null || LoadingScreen.IsLoading || SceneTransition.IsBusy || CoinInput.AnyFocused) return;
 
         if (kb.escapeKey.wasPressedThisFrame || kb.pKey.wasPressedThisFrame)
         {
@@ -382,6 +382,7 @@ public class GameManager : MonoBehaviour
     public void OnEnemyKilled(Enemy enemy)
     {
         GameSession.Kills++;
+        Sfx.Play(Sfx.Clip.EnemyDeath, 0.7f);
         Combo++;
         comboTimer = 2.5f;
 
@@ -400,6 +401,7 @@ public class GameManager : MonoBehaviour
         if (IsOver) return;
         IsOver = true;
         Sfx.StopHordeMusic();
+        Sfx.Play(Sfx.Clip.GameOver);
         StartCoroutine(GameOverRoutine());
     }
 

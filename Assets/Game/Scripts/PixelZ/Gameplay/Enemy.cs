@@ -437,6 +437,7 @@ public class Enemy : MonoBehaviour
                 }
                 else
                 {
+                    Sfx.Play(Sfx.Clip.EnemySword, 0.6f);
                     Vector2 facing = body.flipX ? Vector2.left : Vector2.right;
                     Vector2 hitPoint = (Vector2)transform.position + facing * 0.3f * Def.scale;
                     // Sólo golpea si está en el mismo nivel (no a través de un desnivel).

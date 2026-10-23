@@ -80,6 +80,7 @@ public class Breakable : MonoBehaviour
     {
         hits++;
         wobble = 0.18f;
+        Sfx.Play(Sfx.Clip.Breakable, 0.8f);
         string layer = renderers.Length > 0 ? renderers[0].sortingLayerName : FX.TopSortingLayer;
         FX.Burst(Center, debrisColor, 5, 2.2f, 0.07f, layer);
         if (hits >= maxHits) Break(layer);

@@ -253,6 +253,7 @@ public class PlayerController : MonoBehaviour
             hitDone = true;
             if (!abilityAttack)
             {
+                Sfx.Play(Sfx.Clip.PlayerHit, 0.8f);
                 if (Def.ranged) ShootArrow(attackDir, 0);
                 else MeleeHit();
             }
@@ -291,6 +292,7 @@ public class PlayerController : MonoBehaviour
     {
         abilityTimer = AbilityCooldown;
         string layer = SortingLayer;
+        Sfx.Play(Sfx.Clip.PlayerHit);
 
         switch (Def.ability)
         {
