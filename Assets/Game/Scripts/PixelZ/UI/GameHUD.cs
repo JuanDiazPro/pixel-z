@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-// HUD de la partida: corazones, monedas, gemas, llave, ronda, tiempo, habilidad, dash,
+// HUD de la partida: corazones, monedas, llave, ronda, tiempo, habilidad, dash,
 // avisos (toasts), carteles de ronda, textos sobre objetos interactivos y números de daño.
 public class GameHUD : MonoBehaviour
 {
@@ -13,8 +13,8 @@ public class GameHUD : MonoBehaviour
 
     private readonly List<Image> hearts = new List<Image>();
     private RectTransform heartsRow;
-    private Text coinsText, gemsText, waveText, waveInfo, timeText, killsText, comboText;
-    private RectTransform coinIcon, gemIcon;
+    private Text coinsText, waveText, waveInfo, timeText, killsText, comboText;
+    private RectTransform coinIcon;
     private Image keyIcon;
     private Image abilityIcon, abilityFill, dashFill, potionIcon, potionFill;
     private Text abilityText, abilityKey, dashText;
@@ -47,7 +47,7 @@ public class GameHUD : MonoBehaviour
         public float time;
     }
 
-    private float coinPulse, gemPulse;
+    private float coinPulse;
 
     public static GameHUD Create()
     {
@@ -88,13 +88,9 @@ public class GameHUD : MonoBehaviour
         coinsText = UIFactory.Text(topLeft.transform, "0", 34, UIFactory.Gold, TextAnchor.MiddleLeft);
         UIFactory.Place(coinsText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(68f, -82f), new Vector2(130f, 48f));
 
-        gemIcon = UIFactory.Image(topLeft.transform, "Gem", db.gem, Color.white).rectTransform;
-        UIFactory.Place(gemIcon, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(200f, -84f), new Vector2(44f, 44f));
-        gemsText = UIFactory.Text(topLeft.transform, "0", 34, new Color(0.5f, 0.95f, 1f), TextAnchor.MiddleLeft);
-        UIFactory.Place(gemsText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(252f, -82f), new Vector2(90f, 48f));
-
+        // Las gemas no son otra moneda: suman GemValue monedas a este mismo contador.
         keyIcon = UIFactory.Image(topLeft.transform, "Key", db.key, Color.white);
-        UIFactory.Place(keyIcon.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(350f, -80f), new Vector2(52f, 52f));
+        UIFactory.Place(keyIcon.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(210f, -80f), new Vector2(52f, 52f));
 
         // Objetivo actual (debajo del panel)
         objectiveText = UIFactory.Text(root, "", 22, UIFactory.Cream, TextAnchor.UpperLeft);
@@ -135,11 +131,13 @@ public class GameHUD : MonoBehaviour
 
         // --- Abajo a la izquierda: habilidad, dash y poción ---
         abilityIcon = BuildSlot("Ability", new Vector2(24f, 24f), out abilityFill, out abilityText);
+        UIFactory.Stretch(abilityIcon.rectTransform, 10f);   // los iconos de habilidad ya traen su propio marco/aire
         abilityKey = UIFactory.Text(abilityIcon.transform.parent, "Click der. / Q", 18, UIFactory.Cream);
         UIFactory.Place(abilityKey.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 0f), new Vector2(0f, 4f), new Vector2(200f, 26f));
 
         Image dashIcon = BuildSlot("Dash", new Vector2(150f, 24f), out dashFill, out dashText);
-        dashIcon.sprite = db.helmet;
+        dashIcon.sprite = db.DashIcon;
+        UIFactory.Stretch(dashIcon.rectTransform, 10f);
         Text dashKey = UIFactory.Text(dashIcon.transform.parent, "Espacio", 18, UIFactory.Cream);
         UIFactory.Place(dashKey.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 0f), new Vector2(0f, 4f), new Vector2(160f, 26f));
 
@@ -293,13 +291,10 @@ public class GameHUD : MonoBehaviour
     private void UpdateCurrency()
     {
         coinsText.text = GameSession.Coins.ToString();
-        gemsText.text = GameSession.GemsCollected.ToString();
         keyIcon.gameObject.SetActive(GameSession.HasKey);
 
         coinPulse = Mathf.MoveTowards(coinPulse, 0f, Time.unscaledDeltaTime * 3f);
-        gemPulse = Mathf.MoveTowards(gemPulse, 0f, Time.unscaledDeltaTime * 3f);
         coinIcon.localScale = Vector3.one * (1f + 0.35f * coinPulse);
-        gemIcon.localScale = Vector3.one * (1f + 0.35f * gemPulse);
 
         float t = GameSession.TimeAlive;
         timeText.text = string.Format("{0:00}:{1:00}", (int)(t / 60f), (int)(t % 60f));
@@ -338,9 +333,7 @@ public class GameHUD : MonoBehaviour
         PlayerController p = PlayerController.Instance;
         if (p == null) return;
 
-        abilityIcon.sprite = p.Def.ability == AbilityType.ArrowRain ? db.bow
-                           : p.Def.ability == AbilityType.Shield ? db.shield
-                           : p.Def.ability == AbilityType.Fury ? db.mana : db.sword;
+        abilityIcon.sprite = db.AbilityIcon(p.Def.ability);
         abilityFill.fillAmount = p.AbilityRemaining / Mathf.Max(p.AbilityCooldown, 0.01f);
         abilityText.text = p.AbilityRemaining > 0f ? Mathf.CeilToInt(p.AbilityRemaining).ToString() : "";
         abilityKey.text = p.Def.abilityName;
@@ -475,8 +468,7 @@ public class GameHUD : MonoBehaviour
     public static void PulseCurrency(PickupType type)
     {
         if (instance == null) return;
-        if (type == PickupType.Coin) instance.coinPulse = 1f;
-        if (type == PickupType.Gem) instance.gemPulse = 1f;
+        if (type == PickupType.Coin || type == PickupType.Gem) instance.coinPulse = 1f;
     }
 
     public static void FlashDamage()

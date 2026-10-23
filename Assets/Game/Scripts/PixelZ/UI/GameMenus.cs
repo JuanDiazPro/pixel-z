@@ -316,7 +316,6 @@ public class GameMenus : MonoBehaviour
             "Personaje:  <color=#ffd24d>" + GameSession.Class.name + "</color>\n" +
             "Ronda alcanzada:  <color=#ffd24d>" + GameSession.Wave + "</color>   (" + map + ")\n" +
             "Monedas recogidas:  <color=#ffd24d>" + GameSession.CoinsCollected + "</color>\n" +
-            "Gemas recogidas:  <color=#7ff2ff>" + GameSession.GemsCollected + "</color>\n" +
             "Enemigos eliminados:  <color=#ffd24d>" + GameSession.Kills + "</color>\n" +
             "Tiempo sobrevivido:  <color=#ffd24d>" + time + "</color>";
         gameOverRecord.text = record ? "¡NUEVO RÉCORD!" : "Récord: ronda " + GameSession.BestWave + "  ·  " + GameSession.BestCoins + " monedas";

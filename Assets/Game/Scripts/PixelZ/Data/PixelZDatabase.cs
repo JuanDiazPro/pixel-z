@@ -41,6 +41,26 @@ public class PixelZDatabase : ScriptableObject
     public Sprite apple;
     public Sprite map;
 
+    [Header("Habilidades")]
+    public Sprite whirlwind;
+    public Sprite arrowRain;
+    public Sprite fury;
+    public Sprite dash;
+
+    // Icono de la habilidad de una clase (si falta el propio, uno genérico del pack de iconos).
+    public Sprite AbilityIcon(AbilityType ability)
+    {
+        switch (ability)
+        {
+            case AbilityType.ArrowRain: return arrowRain != null ? arrowRain : bow;
+            case AbilityType.Shield: return shield;
+            case AbilityType.Fury: return fury != null ? fury : mana;
+            default: return whirlwind != null ? whirlwind : sword;
+        }
+    }
+
+    public Sprite DashIcon => dash != null ? dash : helmet;
+
     [Header("Pantallas")]
     public Sprite menuBackground;
     public Sprite loadingBackground;

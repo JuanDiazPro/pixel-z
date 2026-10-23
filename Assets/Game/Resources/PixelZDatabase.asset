@@ -211,6 +211,10 @@ MonoBehaviour:
   gear: {fileID: 21300000, guid: 869e048cb3bf83a54e4f979273668fd2, type: 3}
   apple: {fileID: 21300000, guid: 694a6f058d12dc4d803746aa49d21169, type: 3}
   map: {fileID: 21300000, guid: 117d730573c4f361e0915c6b30e49be5, type: 3}
+  whirlwind: {fileID: 21300000, guid: 5919dc415b2580346a3304dd0c18080e, type: 3}
+  arrowRain: {fileID: 21300000, guid: 01859770c1dc49f4c9da048b699c5408, type: 3}
+  fury: {fileID: 21300000, guid: d6d1c432304f24046b46329e651db0a0, type: 3}
+  dash: {fileID: 21300000, guid: e7a17796ef0291b4cbb6ad6413de0f98, type: 3}
   menuBackground: {fileID: 21300000, guid: c8c0818404b7e7946bc9c39bea167318, type: 3}
   loadingBackground: {fileID: 21300000, guid: e136e2eb049d8a346ba218fa73f6fdc0, type: 3}
   pauseBackground: {fileID: 21300000, guid: f87d28332406e3f409ea4a0df95f0f54, type: 3}

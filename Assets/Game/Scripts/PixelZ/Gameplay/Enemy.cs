@@ -30,7 +30,17 @@ public class Enemy : MonoBehaviour
     private int volleysFired;
     private float ringOffset;
     private Transform warning;
-    private float unstickSign = 1f;
+
+    // Navegación: punto del camino al que se dirige, se recalcula cada poco o al llegar.
+    private Vector2 waypoint;
+    private bool hasWaypoint;
+    private float replanTimer;
+    private Vector2 unstickDir;
+    private int stuckCount;
+    private float progressTimer;
+    private int progressCost = int.MaxValue;
+    private bool seesPlayer;
+    private float sightTimer;
 
     private Rigidbody2D rb;
     private Collider2D col;
@@ -201,46 +211,162 @@ public class Enemy : MonoBehaviour
             return;
         }
 
+        float dt = Time.fixedDeltaTime;
         Vector2 desired = Vector2.zero;
         PlayerController player = PlayerController.Instance;
+        bool chasing = false;
         if (state == State.Chase && stun <= 0f && player != null && !player.Dead)
         {
             Vector2 toPlayer = (Vector2)player.transform.position - (Vector2)transform.position;
             float dist = toPlayer.magnitude;
-            Vector2 dir = FlowField.Instance != null ? FlowField.Instance.DirectionTo(transform.position, gameObject.layer, player.transform.position) : toPlayer.normalized;
 
             if (Def.ranged)
             {
-                if (dist > Def.preferredDistance) desired = dir;
+                // Sólo se queda a distancia de tiro si ve al jugador; si no, sigue el camino hasta tenerlo a tiro.
+                if (dist > Def.preferredDistance || !seesPlayer)
+                {
+                    desired = PathDirection(player);
+                    chasing = true;
+                }
                 else if (dist < Def.preferredDistance - 1.5f) desired = -toPlayer.normalized * 0.7f;
                 else desired = strafe * 0.5f;
             }
-            else if (dist > StopDistance)
+            else if (dist > StopDistance || !SameLevel(player))
             {
-                desired = dir;
+                desired = PathDirection(player);
+                chasing = true;
             }
+            chasing &= desired.sqrMagnitude > 0.01f;
         }
 
-        // Si lleva un rato empujando contra algo sin moverse, rodea el obstáculo por un lado.
-        if (desired.sqrMagnitude > 0.01f && rb.linearVelocity.sqrMagnitude < 0.02f * speed * speed) stuckTime += Time.fixedDeltaTime;
-        else stuckTime = Mathf.Max(0f, stuckTime - Time.fixedDeltaTime);
-        if (stuckTime > 0.4f)
+        if (chasing)
+        {
+            desired = (desired + Separation() * 0.8f).normalized * Mathf.Min(1f, desired.magnitude);
+            UpdateStuck(ref desired, dt);
+            CheckProgress(player, dt);
+        }
+        else
         {
             stuckTime = 0f;
-            unstickTime = 0.5f;
-            unstickSign = Random.value < 0.5f ? -1f : 1f;
-        }
-        if (unstickTime > 0f)
-        {
-            unstickTime -= Time.fixedDeltaTime;
-            desired = ((Vector2)(Quaternion.Euler(0f, 0f, 80f * unstickSign) * desired)).normalized;
+            unstickTime = 0f;
+            progressTimer = 0f;
         }
 
         rb.linearVelocity = desired * speed + knock;
-        knock = Vector2.MoveTowards(knock, Vector2.zero, (Def.boss ? 60f : 25f) * Time.fixedDeltaTime);
+        knock = Vector2.MoveTowards(knock, Vector2.zero, (Def.boss ? 60f : 25f) * dt);
     }
 
     private float StopDistance => 0.45f * Def.scale;
+
+    // Centro del cuerpo físico: es lo que choca, así que es lo que se navega.
+    private Vector2 NavPosition => rb.position + col.offset;
+    private float BodyRadius => 0.22f * Def.scale;
+
+    private bool SameLevel(PlayerController player) => gameObject.layer == player.gameObject.layer;
+
+    private Vector2 PathDirection(PlayerController player)
+    {
+        Vector2 pos = NavPosition;
+        Vector2 target = player.transform.position;
+        FlowField field = FlowField.Instance;
+        if (field == null) return (target - pos).normalized;
+
+        replanTimer -= Time.fixedDeltaTime;
+        if (replanTimer <= 0f || !hasWaypoint || (waypoint - pos).sqrMagnitude < 0.06f)
+        {
+            replanTimer = Random.Range(0.12f, 0.22f);   // escalonado para no recalcular todos a la vez
+            hasWaypoint = field.NextWaypoint(pos, gameObject.layer, BodyRadius, target, player.gameObject.layer, out waypoint);
+        }
+        Vector2 to = (hasWaypoint ? waypoint : target) - pos;
+        return to.sqrMagnitude > 0.0001f ? to.normalized : Vector2.zero;
+    }
+
+    // Se aparta un poco de los enemigos de al lado para no taponar pasillos ni amontonarse en el mismo hueco.
+    private Vector2 Separation()
+    {
+        Vector2 pos = rb.position;
+        Vector2 push = Vector2.zero;
+        foreach (Enemy e in All)
+        {
+            if (e == this || !e.Alive || e.gameObject.layer != gameObject.layer) continue;
+            float range = (BodyRadius + e.BodyRadius) * 1.6f;
+            Vector2 d = pos - e.rb.position;
+            float sq = d.sqrMagnitude;
+            if (sq >= range * range) continue;
+            if (sq < 0.0001f)
+            {
+                push += Random.insideUnitCircle;
+                continue;
+            }
+            float m = Mathf.Sqrt(sq);
+            push += d / m * (1f - m / range);
+        }
+        return Vector2.ClampMagnitude(push, 1f);
+    }
+
+    // Si lleva un rato empujando sin moverse: primero se aparta a una zona despejada y vuelve a calcular el camino;
+    // si se repite, rodea el obstáculo alternando el lado.
+    private void UpdateStuck(ref Vector2 desired, float dt)
+    {
+        if (unstickTime > 0f)
+        {
+            unstickTime -= dt;
+            desired = unstickDir;
+            if (unstickTime <= 0f) replanTimer = 0f;
+            return;
+        }
+
+        if (rb.linearVelocity.sqrMagnitude < 0.05f * speed * speed) stuckTime += dt;
+        else
+        {
+            stuckTime = Mathf.Max(0f, stuckTime - dt);
+            if (stuckTime <= 0f) stuckCount = 0;
+        }
+        if (stuckTime < 0.35f) return;
+
+        stuckTime = 0f;
+        stuckCount++;
+        unstickTime = 0.4f;
+        FlowField field = FlowField.Instance;
+        Vector2 pos = NavPosition;
+        if (stuckCount % 2 == 1 && field != null && field.SafeSpot(pos, gameObject.layer, out Vector2 spot) && (spot - pos).sqrMagnitude > 0.01f)
+            unstickDir = (spot - pos).normalized;
+        else
+            unstickDir = ((Vector2)(Quaternion.Euler(0f, 0f, stuckCount % 4 < 2 ? 90f : -90f) * desired)).normalized;
+        desired = unstickDir;
+    }
+
+    // Último recurso: si en varios segundos no se ha acercado nada y el jugador no lo ve, avanza unas celdas por
+    // el camino (fuera de cámara no se nota y evita enemigos olvidados en un rincón que alargan la ronda).
+    private void CheckProgress(PlayerController player, float dt)
+    {
+        FlowField field = FlowField.Instance;
+        if (field == null) return;
+        progressTimer += dt;
+        if (progressTimer < 3f) return;
+        progressTimer = 0f;
+
+        Vector2 pos = NavPosition;
+        int cost = field.CostAt(pos, gameObject.layer);
+        bool advanced = cost < progressCost - 15;
+        progressCost = cost;
+        if (advanced || OnScreen()) return;
+
+        if (field.PointAhead(pos, gameObject.layer, 4, out Vector2 ahead))
+        {
+            rb.position = ahead - col.offset;
+            hasWaypoint = false;
+            progressCost = field.CostAt(ahead, gameObject.layer);
+        }
+    }
+
+    private bool OnScreen()
+    {
+        Camera cam = Camera.main;
+        if (cam == null) return true;
+        Vector3 v = cam.WorldToViewportPoint(transform.position);
+        return v.x > -0.1f && v.x < 1.1f && v.y > -0.1f && v.y < 1.1f;
+    }
 
     private void UpdateChase(PlayerController player)
     {
@@ -272,7 +398,15 @@ public class Enemy : MonoBehaviour
             }
         }
 
-        bool inRange = Def.ranged ? dist < Def.preferredDistance + 1.5f : dist < Def.attackRange + 0.25f;
+        // ¿Ve al jugador? (mismo nivel y sin muros en medio). Los arqueros no disparan contra la pared.
+        sightTimer -= Time.deltaTime;
+        if (sightTimer <= 0f)
+        {
+            sightTimer = Random.Range(0.2f, 0.3f);
+            seesPlayer = SameLevel(player) && (FlowField.Instance == null || FlowField.Instance.LineOfSight(HitCenter, player.Center, gameObject.layer));
+        }
+
+        bool inRange = Def.ranged ? dist < Def.preferredDistance + 1.5f && seesPlayer : dist < Def.attackRange + 0.25f && SameLevel(player);
         if (inRange && attackTimer <= 0f && stun <= 0f)
         {
             SetState(State.Attack);

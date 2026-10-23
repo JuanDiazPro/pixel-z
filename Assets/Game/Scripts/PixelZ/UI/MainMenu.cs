@@ -159,8 +159,11 @@ public class MainMenu : MonoBehaviour
         StatRow(t, "Cadencia", def.statRate, ref y);
         StatRow(t, "Alcance", def.statRange, ref y);
 
-        Text ability = UIFactory.Text(t, "<color=#ffd24d>" + def.abilityName + "</color>\n<size=19>" + def.abilityDescription + "</size>", 24, UIFactory.Cream);
-        UIFactory.Place(ability.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, y - 8f), new Vector2(370f, 80f));
+        Image abilityIcon = UIFactory.Image(t, "Ability Icon", db.AbilityIcon(def.ability), Color.white);
+        abilityIcon.preserveAspect = true;
+        UIFactory.Place(abilityIcon.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-148f, y - 14f), new Vector2(68f, 68f));
+        Text ability = UIFactory.Text(t, "<color=#ffd24d>" + def.abilityName + "</color>\n<size=19>" + def.abilityDescription + "</size>", 24, UIFactory.Cream, TextAnchor.UpperLeft);
+        UIFactory.Place(ability.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(38f, y - 8f), new Vector2(290f, 80f));
 
         // Corazones iniciales
         for (int h = 0; h < GameSession.StartHearts; h++)

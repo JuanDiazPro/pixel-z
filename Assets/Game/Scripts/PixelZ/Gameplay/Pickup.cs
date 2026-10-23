@@ -140,9 +140,9 @@ public class Pickup : MonoBehaviour
                 GameHUD.Popup(player.Center + Vector2.up * 0.7f, "+" + value, new Color(1f, 0.85f, 0.25f));
                 break;
             case PickupType.Gem:
+                // Una gema es una moneda que vale más (GemValue): va al mismo saldo que se gasta en la tienda.
                 GameSession.AddCoins(value);
-                GameSession.GemsCollected++;
-                GameHUD.Popup(player.Center + Vector2.up * 0.7f, "+" + value + " gema", new Color(0.4f, 0.95f, 1f));
+                GameHUD.Popup(player.Center + Vector2.up * 0.7f, "+" + value, new Color(1f, 0.85f, 0.25f));
                 FX.Burst(transform.position, new Color(0.5f, 1f, 1f), 8, 2.5f, 0.06f, layer);
                 break;
             case PickupType.Heart:

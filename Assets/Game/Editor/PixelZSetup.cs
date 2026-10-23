@@ -189,6 +189,11 @@ public static class PixelZSetup
         db.gear = LoadSprite(Icons + "menu/gear.png");
         db.map = LoadSprite(Icons + "tools/map.png");
 
+        db.whirlwind = LoadIcon(Icons + "Iconos Adicionales/Torbellino.png");
+        db.arrowRain = LoadIcon(Icons + "Iconos Adicionales/lluvia_de_flechas.png");
+        db.fury = LoadIcon(Icons + "Iconos Adicionales/Furia.png");
+        db.dash = LoadIcon(Icons + "Iconos Adicionales/Dash.png");
+
         db.menuBackground = LoadSprite("Assets/Images/Menu_pixelZ.jpg");
         db.loadingBackground = LoadSprite("Assets/Images/PantallaDeCarga_pixelZ.jpg");
         db.pauseBackground = LoadSprite("Assets/Images/Pausa_pixelZ.jpg");
@@ -253,6 +258,22 @@ public static class PixelZSetup
     {
         if (!File.Exists(path)) return null;
         return AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().OrderBy(s => s.rect.x).ToArray();
+    }
+
+    // Icono suelto (una imagen = un sprite). Si se importó como "Multiple", Unity lo trocea (p. ej. las chispas
+    // de la Furia salían como sprites aparte), así que se fuerza a Single con mipmaps para que se vea bien pequeño.
+    public static Sprite LoadIcon(string path)
+    {
+        if (AssetImporter.GetAtPath(path) is TextureImporter importer &&
+            (importer.textureType != TextureImporterType.Sprite || importer.spriteImportMode != SpriteImportMode.Single || !importer.mipmapEnabled))
+        {
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.mipmapEnabled = true;
+            importer.alphaIsTransparency = true;
+            importer.SaveAndReimport();
+        }
+        return LoadSprite(path);
     }
 
     private static Sprite LoadSprite(string path)

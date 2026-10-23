@@ -19,8 +19,7 @@ public static class GameSession
     public static int ClassIndex;
     public static int Wave;             // última ronda iniciada (global, continúa entre mapas)
     public static int Coins;            // monedas disponibles para gastar
-    public static int CoinsCollected;   // valor total recogido en la partida
-    public static int GemsCollected;
+    public static int CoinsCollected;   // valor total recogido en la partida (gemas incluidas)
     public static int Kills;
     public static float TimeAlive;
     public static int Hearts;
@@ -51,7 +50,6 @@ public static class GameSession
         Wave = 0;
         Coins = 0;
         CoinsCollected = 0;
-        GemsCollected = 0;
         Kills = 0;
         TimeAlive = 0f;
         MaxHearts = StartHearts;
